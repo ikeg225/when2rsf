@@ -7,7 +7,9 @@ load_dotenv()
 WEATHER_API_KEY = os.getenv('WEATHER_API_KEY')
 
 parameters = {
-    'q': 'berkeley'
+    'q': 'berkeley',
+    'days': 3,
+    'aqi': 'yes'
 }
 
 response = requests.get(f'http://api.weatherapi.com/v1/forecast.json?key={WEATHER_API_KEY}', params = parameters)
