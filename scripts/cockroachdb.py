@@ -14,7 +14,6 @@ class CockroachDB:
                 time TIMESTAMP,
                 is_open BOOL,
                 current_capacity INT,
-                capacity_percentage INT,
                 day_of_week INT,
                 temperature INT,
                 temp_feel INT,
@@ -48,14 +47,13 @@ class CockroachDB:
         
         self.connection.commit()
 
-    def insert_only_crowdometer_data(self, capacity_percentage, time, current_capacity):
+    def insert_only_crowdometer_data(self, time, current_capacity):
         insert_sql = """
-        INSERT INTO rsf_training (capacity_percentage, time, current_capacity)
-        VALUES (%(capacity_percentage)s, %(time)s, %(current_capacity)s)
+        INSERT INTO rsf_training (time, current_capacity)
+        VALUES (%(time)s, %(current_capacity)s)
         """
 
         data = {
-            'capacity_percentage': capacity_percentage,
             'time': time,
             'current_capacity': current_capacity
         }
