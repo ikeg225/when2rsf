@@ -92,7 +92,12 @@ class CockroachDB:
                 self.connection.commit()
                 print(batch_dict)
 
+    def delete_rows(self):
+        with self.connection.cursor() as cursor:
+            cursor.execute("TRUNCATE rsf_training")
+
     
 cockroach = CockroachDB()
-# cockroach.bulk_insert_crowdometer_data(['2022-10-01 07:20:00', '2022-10-01 07:25:00', '2022-10-01 07:30:00', '2022-10-01 07:35:00'], [12, 34, 49, 69], [1, 7, 2, 4])
+#cockroach.bulk_insert_crowdometer_data(['2022-10-01 07:20:00', '2022-10-01 07:25:00', '2022-10-01 07:30:00', '2022-10-01 07:35:00'], [12, 34, 49, 69], [1, 7, 2, 4])
+cockroach.delete_rows()
 print(cockroach.get_all_rows())
