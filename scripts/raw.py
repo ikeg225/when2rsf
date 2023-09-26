@@ -1,4 +1,13 @@
 import pandas as pd
+import os
+import psycopg
+from dotenv import load_dotenv
+from cockroachdb import CockroachDB
+
+
+load_dotenv()
+
+
 raw = pd.read_csv(r"C:/Users/kerry/when2rsf/when2rsf/cleanedData.csv")
 
 raw.drop(['ratio','temp','temp_feel','hour','minute','pressure','humidity','temp_min',"temp_max",'by15','minute15'], axis=1, inplace=True)
@@ -16,5 +25,8 @@ raw.drop('by5', axis=1, inplace=True)
 
 raw = raw.reindex(columns=['Timestamp','weekday','count'])
 #print(raw.mean)
-print(raw.head(10))
+
+db=CockroachDB()
+db.bulk_insert_crowdometer_data(raw[::,0],raw[::,2],raw[::,1])
+
 
