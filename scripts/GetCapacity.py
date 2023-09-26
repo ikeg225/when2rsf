@@ -1,6 +1,7 @@
 import requests 
 import json 
-
+import time
+from datetime import datetime 
 def send_api_request(): 
     url = "https://api.density.io/v2/displays/dsp_956223069054042646" 
 
@@ -39,6 +40,25 @@ def find_count():
     else:
         print("Key 'current_count' not found in the dictionary.") 
 
+def wait_for_next_multiple_of_5_minutes():
+    current_time = datetime.now()
+    next_time = current_time.replace(second=0, microsecond=0)
+    while next_time.minute % 5 != 0:
+        next_time += timedelta(minutes=1)
+        time.sleep((next_time - current_time).total_seconds())
+
+
+#this is the second option, could work gotta look at it later
+def wait_for_next_multiple_of_5_minutes():
+    global output  # Define output as a global variable
+    current_time = datetime.now()
+    next_time = current_time.replace(second=0, microsecond=0)
+    while next_time.minute % 5 != 0:
+        next_time += timedelta(minutes=1)
+    time.sleep((next_time - current_time).total_seconds())
+    output = retrieve_request()  # Make the API request and assign the result to the global output variable
+    find_count()  # Process the API response with find_count
+
 
 print(find_count())
-
+print(wait_for_next_multiple_of_5_minutes())
