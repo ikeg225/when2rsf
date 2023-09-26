@@ -71,3 +71,26 @@ class CockroachDB:
             rows = cursor.fetchall()
         
         return rows
+    
+    def bulk_insert_crowdometer_data(self, time_series, current_capacity_series):
+    
+        inserts_sql = """
+        INSERT INTO rsf_training (time, current_capacity)
+        VALUES (%(time)s, %(current_capacity)s)
+        """
+        big_data = {
+            'time': time_series,
+            'current_capacity': current_capacity_series
+        }
+
+        batch_size = 500 #batch size to send 500 rows at a time
+
+        data_batches = [big_data[i:i + batch_size] for i in range(0, len(big_data), batch_size)] #splits the data into batches of 500 rows
+        with self.connection.cursor() as cursor:   
+            for batch in data_batches:
+                cursor.executemany(inserts_sql, batch)
+                self.connection.commit()
+                print(batch)
+    
+cockroach = CockroachDB()
+cockroach.bulk_insert_crowdometer_data(['123', '456'], [12, 34])
