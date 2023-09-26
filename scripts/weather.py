@@ -23,9 +23,11 @@ if response.status_code == 200:
     data = response.json()
     
     # Access and use the data
-    temperature = data['current']['temp_c']
+    temperature = data['current']['temp_f']
     description = data['current']['condition']['text']
-
+    day_of_the_week = data['current']['is_day'] + 1
+    temp_feel = data['current']['feelslike_f']
+    weather_code = data['current']['code']
     # Get today's date and calculate the date for the next day
     today = datetime.now().date()
     next_day = today + timedelta(days=1)
@@ -36,14 +38,20 @@ if response.status_code == 200:
         if date == next_day:
             next_day_forecast = forecast
             break
+    
     #chance_of_rain = tomorrow_forecast['day']['daily_chance_of_rain']
     # Print the weather information
-    print(f"Temperature: {temperature}°C")
+    print("Date:", today)
+    print(f"Day of the Week: {day_of_the_week}")
+    print(f"Temperature: {temperature}°F")
+    print(f"Feels Like: ", temp_feel, "°F")
+    print(f"Weather Code: ", weather_code)
     print(f"Description: {description}")
     # Print forcast for next day
     print("Forecast for the next day:")
     print(f"Date: {next_day_forecast['date']}")
-    print(f"Temperature: {next_day_forecast['day']['avgtemp_c']}°C")
+  #  print(f"Day of the Week: {next_day_forecast['is_day']}")
+    print(f"Temperature: {next_day_forecast['day']['avgtemp_f']}°F")
     #print(f"Description: {next_day_forecast['day']['condition']['text']}") this prints text, not a percentage of probability it will rain
     print(f"Description: {next_day_forecast['day']['daily_chance_of_rain']}") #this just adds all the percentages together
     print("other alg")
