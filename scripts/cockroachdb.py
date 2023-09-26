@@ -71,26 +71,28 @@ class CockroachDB:
             rows = cursor.fetchall()
         
         return rows
-    
-    def bulk_insert_crowdometer_data(self, time_series, current_capacity_series):
-    
+
+    def bulk_insert_crowdometer_data(self, time_series, current_capacity_series, day_of_week):
         inserts_sql = """
-        INSERT INTO rsf_training (time, current_capacity)
-        VALUES (%(time)s, %(current_capacity)s)
+        INSERT INTO rsf_training (time, current_capacity, day_of_week)
+        VALUES (%(time)s, %(current_capacity)s, %(day_of_week)s)
         """
-        big_data = {
-            'time': time_series,
-            'current_capacity': current_capacity_series
-        }
+    
+        # Assuming time_series, current_capacity_series, and day_of_week are lists
+        big_data = list(zip(time_series, current_capacity_series, day_of_week))
+    
+        batch_size = 500  # Batch size to send 500 rows at a time
 
-        batch_size = 500 #batch size to send 500 rows at a time
+        data_batches = [big_data[i:i + batch_size] for i in range(0, len(big_data), batch_size)]
 
-        data_batches = [big_data[i:i + batch_size] for i in range(0, len(big_data), batch_size)] #splits the data into batches of 500 rows
-        with self.connection.cursor() as cursor:   
+        with self.connection.cursor() as cursor:
             for batch in data_batches:
-                cursor.executemany(inserts_sql, batch)
+                batch_dict = [{'time': row[0], 'current_capacity': row[1], 'day_of_week': row[2]} for row in batch]
+                cursor.executemany(inserts_sql, batch_dict)
                 self.connection.commit()
-                print(batch)
+                print(batch_dict)
+
     
 cockroach = CockroachDB()
-cockroach.bulk_insert_crowdometer_data(['123', '456'], [12, 34])
+# cockroach.bulk_insert_crowdometer_data(['2022-10-01 07:20:00', '2022-10-01 07:25:00', '2022-10-01 07:30:00', '2022-10-01 07:35:00'], [12, 34, 49, 69], [1, 7, 2, 4])
+print(cockroach.get_all_rows())
