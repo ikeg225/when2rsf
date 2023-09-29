@@ -13,6 +13,7 @@ parameters = {
     'exclude': 'current,minutely,hourly,astronomy'
 }
 
+
 response = requests.get(f'http://api.weatherapi.com/v1/forecast.json?key={WEATHER_API_KEY}', params = parameters)
 
 #print(response.text)
@@ -21,6 +22,24 @@ if response.status_code == 200:
     
     # Parse the JSON response
     data = response.json()
+    
+    # Put data into dictionary
+    data_dict = {
+        'time' : data['current']['time'],
+        'day_of_the_week' : data['current']['is_day'] + 1,
+        'temperature' : data['current']['temp_f'],
+        #'description' : data['current']['condition']['text'],
+        'temp_feel' : data['current']['feelslike_f'],
+        'weather_code' : data['current']['code'],
+        'wind_mph' : data['current']['wind_mph'],
+        'wind_degree' : data['current']['wind_degree'],
+        'pressure_mb' : data['current']['pressure_mb'],
+        'precipitation_mm' : data['current']['precip_mm'],
+        'humidity' : data['current']['humidity'],
+        'cloudiness' : data['current']['cloud'],
+        'uv_index' : data['current']['uv'],
+        'gust_mph' : data['current']['gust_mph'],
+    }
     
     # Access and use the data
     temperature = data['current']['temp_f']
@@ -47,6 +66,7 @@ if response.status_code == 200:
     print(f"Feels Like: ", temp_feel, "°F")
     print(f"Weather Code: ", weather_code)
     print(f"Description: {description}")
+    print()
     # Print forcast for next day
     print("Forecast for the next day:")
     print(f"Date: {next_day_forecast['date']}")
