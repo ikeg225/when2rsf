@@ -97,7 +97,7 @@ def get_current():
 
     return data_dict
 
-print(get_dict())
+print(get_current())
 
 '''def get_dict():
     return data_dict'''
