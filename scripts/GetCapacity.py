@@ -1,9 +1,8 @@
 import requests 
 import json 
 import time
-from datetime import datetime 
-from weather import get_current
-# get_dict takes in no parameters, returns dictionary of current weather
+from datetime import datetime, timedelta
+from dotenv import load_dotenv
 
 def send_api_request(): 
     url = "https://api.density.io/v2/displays/dsp_956223069054042646" 
@@ -26,15 +25,15 @@ def retrieve_request():
     if __name__ == '__main__':
         api_response = send_api_request() 
         if api_response: 
-            print("API Response:", api_response) 
+            print("API Response:", "Works") 
             return api_response
         else: 
             print("failed to retrieve API response.")
 
 output = retrieve_request()
-def find_count():
+def find_count(request):
 # Access the value associated with the key "current count"
-    current_count_value = output.get("dedicated_space").get('current_count')
+    current_count_value = request.get("dedicated_space").get('current_count')
 
 # Check if the key was found in the dictionary
     if current_count_value is not None:
@@ -43,26 +42,24 @@ def find_count():
     else:
         print("Key 'current_count' not found in the dictionary.") 
 
+
 def wait_for_next_multiple_of_5_minutes():
-    current_time = datetime.now()
-    next_time = current_time.replace(second=0, microsecond=0)
-    while next_time.minute % 5 != 0:
+    while True:
+        # Get the current time
+        now = datetime.now()
+        print(now)
+
+        # Calculate the next multiple of 5 minutes that is also at the first minute of the hour
+        next_time = now + timedelta(minutes=5 - now.minute % 5, seconds=-now.second, microseconds=-now.microsecond)
+        print(next_time)
+
+        # Wait until the next multiple of 5 minutes that is also at the first minute of the hour
+        time.sleep((next_time - now).total_seconds())
+
+        # Call find_count() and return the output
         next_time += timedelta(minutes=1)
-        time.sleep((next_time - current_time).total_seconds())
+        data = retrieve_request()
+        print(find_count(data))
 
-
-#this is the second option, could work gotta look at it later
-def wait_for_next_multiple_of_5_minutes():
-    global output  # Define output as a global variable
-    current_time = datetime.now()
-    next_time = current_time.replace(second=0, microsecond=0)
-    while next_time.minute % 5 != 0:
-        next_time += timedelta(minutes=1)
-    time.sleep((next_time - current_time).total_seconds())
-    output = retrieve_request()  # Make the API request and assign the result to the global output variable
-    find_count()  # Process the API response with find_count
-
-
-
-print(find_count())
-print(wait_for_next_multiple_of_5_minutes())
+#print(find_count(retrieve_request()))
+wait_for_next_multiple_of_5_minutes()

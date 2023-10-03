@@ -4,10 +4,9 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-class CockroachDB:
-    def __init__(self):
-        self.connection = psycopg.connect(os.environ["CONNECTION_STRING"])
+connection = psycopg.connect(os.environ["CONNECTION_STRING"])
 
+class CockroachDB:
     def create_rsf_crowdometer(self):
         create_table_sql = """
             CREATE TABLE IF NOT EXISTS rsf_training (
@@ -34,18 +33,18 @@ class CockroachDB:
             );
         """
 
-        with self.connection.cursor() as cursor:
+        with connection.cursor() as cursor:
             cursor.execute(create_table_sql)
 
-        self.connection.commit()
+        connection.commit()
     
     def drop_table(self, table_name):
         drop_table_sql = f"DROP TABLE IF EXISTS {table_name}"
 
-        with self.connection.cursor() as cursor:
+        with connection.cursor() as cursor:
             cursor.execute(drop_table_sql)
         
-        self.connection.commit()
+        connection.commit()
 
     def insert_only_crowdometer_data(self, time, current_capacity):
         insert_sql = """
@@ -58,15 +57,15 @@ class CockroachDB:
             'current_capacity': current_capacity
         }
 
-        with self.connection.cursor() as cursor:
+        with connection.cursor() as cursor:
             cursor.execute(insert_sql, data)
         
-        self.connection.commit()
+        connection.commit()
     
     def get_all_rows(self):
         select_sql = "SELECT * FROM rsf_training"
 
-        with self.connection.cursor() as cursor:
+        with connection.cursor() as cursor:
             cursor.execute(select_sql)
             rows = cursor.fetchall()
         
@@ -85,15 +84,15 @@ class CockroachDB:
 
         data_batches = [big_data[i:i + batch_size] for i in range(0, len(big_data), batch_size)]
 
-        with self.connection.cursor() as cursor:
+        with connection.cursor() as cursor:
             for batch in data_batches:
                 batch_dict = [{'time': row[0], 'current_capacity': row[1], 'day_of_week': row[2]} for row in batch]
                 cursor.executemany(inserts_sql, batch_dict)
-                self.connection.commit()
+                connection.commit()
                 print(batch_dict)
 
     def delete_rows(self):
-        with self.connection.cursor() as cursor:
+        with connection.cursor() as cursor:
             cursor.execute("TRUNCATE rsf_training")
 
     
