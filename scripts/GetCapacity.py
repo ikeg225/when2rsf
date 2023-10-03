@@ -2,6 +2,9 @@ import requests
 import json 
 import time
 from datetime import datetime 
+from weather import get_current
+# get_dict takes in no parameters, returns dictionary of current weather
+
 def send_api_request(): 
     url = "https://api.density.io/v2/displays/dsp_956223069054042646" 
 
@@ -58,6 +61,7 @@ def wait_for_next_multiple_of_5_minutes():
     time.sleep((next_time - current_time).total_seconds())
     output = retrieve_request()  # Make the API request and assign the result to the global output variable
     find_count()  # Process the API response with find_count
+
 
 
 print(find_count())
