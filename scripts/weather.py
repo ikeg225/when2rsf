@@ -97,7 +97,34 @@ def get_current():
 
     return data_dict
 
-print(get_current())
+#print(get_current())
 
 '''def get_dict():
     return data_dict'''
+
+
+def get_history(date):
+
+    str_date = str(date).split()
+
+    day = str_date[0] # example: 2022-10-01
+    time = str_date[1] # example: 07:20:00
+
+    load_dotenv()
+
+    WEATHER_API_KEY = os.getenv('WEATHER_API_KEY')
+
+    parameters = {
+        'q': 'berkeley',
+        'dt': day,
+    }
+
+    response = requests.get(f'http://api.weatherapi.com/v1/history.json?key={WEATHER_API_KEY}', params = parameters)
+
+    return response.text
+
+
+print(get_history("2022-10-03 07:20:00"))
+
+
+
