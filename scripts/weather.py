@@ -23,15 +23,14 @@ def get_dict():
         
         # Parse the JSON response
         data = response.json()
-        
         # Put data into dictionary
         data_dict = {
-            'time' : data['current']['time'],
+            'time' : data['location']['localtime'],
             'day_of_the_week' : data['current']['is_day'] + 1,
             'temperature' : data['current']['temp_f'],
             #'description' : data['current']['condition']['text'],
             'temp_feel' : data['current']['feelslike_f'],
-           # 'weather_code' : data['current']['code'],
+            'weather_code' : data['current']['condition']['code'],
             'wind_mph' : data['current']['wind_mph'],
             'wind_degree' : data['current']['wind_degree'],
             'pressure_mb' : data['current']['pressure_mb'],
