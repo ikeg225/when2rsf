@@ -3,6 +3,7 @@ import json
 import time
 from datetime import datetime, timedelta
 from dotenv import load_dotenv
+
 def send_api_request(): 
     url = "https://api.density.io/v2/displays/dsp_956223069054042646" 
 
