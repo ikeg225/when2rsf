@@ -3,7 +3,7 @@ import requests
 import os
 from dotenv import load_dotenv
 
-def get_dict():
+def get_current():
     load_dotenv()
 
     WEATHER_API_KEY = os.getenv('WEATHER_API_KEY')

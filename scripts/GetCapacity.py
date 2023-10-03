@@ -2,6 +2,9 @@ import requests
 import json 
 import time
 from datetime import datetime 
+from weather import get_current
+# get_dict takes in no parameters, returns dictionary of current weather
+
 def send_api_request(): 
     url = "https://api.density.io/v2/displays/dsp_956223069054042646" 
 
