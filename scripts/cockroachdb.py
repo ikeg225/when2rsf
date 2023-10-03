@@ -46,7 +46,7 @@ class CockroachDB:
         
         connection.commit()
 
-    def insert_only_crowdometer_data(self, time, current_capacity):
+    def insert_only_crowdometer_data(self, time, current_capacity, day_of_the_week,):
         insert_sql = """
         INSERT INTO rsf_training (time, current_capacity)
         VALUES (%(time)s, %(current_capacity)s)
@@ -55,6 +55,18 @@ class CockroachDB:
         data = {
             'time': time,
             'current_capacity': current_capacity
+            'day_of_the_week': 
+            'temperature':
+            'temp_feel':
+            'weather':
+            'wind_mph':
+            'wind_degree':
+            'pressure_mb':
+            'precipitation_mm':
+            'humidity':
+            'coludiness':
+            'uv_index':
+            'gust_mph':
         }
 
         with connection.cursor() as cursor:
