@@ -1,6 +1,7 @@
 import os
 import psycopg
 from dotenv import load_dotenv
+from weather import get_history
 
 load_dotenv()
 
@@ -70,6 +71,43 @@ class CockroachDB:
             rows = cursor.fetchall()
         
         return rows
+
+    def update_rows(weather_data):
+        update_sql = """
+        UPDATE rsf_training
+        SET temperature = %(temperature)s,
+            temp_feel = %(temp_feel)s,
+            weather_code = %(weather_code)s,
+            wind_mph = %(wind_mph)s,
+            wind_degree = %(wind_degree)s,
+            pressure_mb = %(pressure_mb)s,
+            precipitation_mm = %(precipitation_mm)s,
+            humidity = %(humidity)s,
+            cloudiness = %(cloudiness)s,
+            uv_index = %(uv_index)s,
+            gust_mph = %(gust_mph)s
+        WHERE time = %(time)s
+        """
+
+        with connection.cursor() as cursor:
+            for date, weather_info in weather_data.items():
+                data = {
+                    'temperature': weather_info['temperature'],
+                    'temp_feel': weather_info['temp_feel'],
+                    'weather_code': weather_info['weather_code'],
+                    'wind_mph': weather_info['wind_mph'],
+                    'wind_degree': weather_info['wind_degree'],
+                    'pressure_mb': weather_info['pressure_mb'],
+                    'precipitation_mm': weather_info['precipitation_mm'],
+                    'humidity': weather_info['humidity'],
+                    'cloudiness': weather_info['cloudiness'],
+                    'uv_index': weather_info['uv_index'],
+                    'gust_mph': weather_info['gust_mph'],
+                    'time': date
+                }
+                cursor.execute(update_sql, data)
+        
+        connection.commit()
 
     def bulk_insert_crowdometer_data(self, time_series, current_capacity_series, day_of_week):
         inserts_sql = """
