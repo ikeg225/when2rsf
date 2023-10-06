@@ -121,6 +121,14 @@ def get_history(date):
 
     response = requests.get(f'http://api.weatherapi.com/v1/history.json?key={WEATHER_API_KEY}', params = parameters)
 
+    hourly_forecast = response["forecast"]["forecastday"][0]["hour"]
+
+    for hour in hourly_forecast:
+        time = hour["time"]
+        temperature_c = hour["temp_c"]
+        condition = hour["condition"]["text"]
+        print(f"Time: {time}, Temperature: {temperature_c}°C, Condition: {condition}")
+
     return response.text
 
 
