@@ -41,11 +41,6 @@ def get_current():
             'gust_mph' : data['current']['gust_mph'],
         }
 
-        # Access and use the data
-        temperature = data['current']['temp_f']
-        description = data['current']['condition']['text']
-        day_of_the_week = data['current']['is_day'] + 1
-        temp_feel = data['current']['feelslike_f']
        # weather_code = data['current']['code']
         # Get today's date and calculate the date for the next day
         today = datetime.now().date()
@@ -121,39 +116,46 @@ def get_history(date):
     }
 
     response = requests.get(f'http://api.weatherapi.com/v1/history.json?key={WEATHER_API_KEY}', params = parameters)
-    data = response.json()
-    hourly_data = data["forecast"]["forecastday"][0]["hour"]
-    date_object = datetime.strptime(day, "%Y-%m-%d")
-    day_of_week = date_object.isoweekday()
-    hourly_dict = {}
-    for hour in hourly_data:
-        time = hour['time']
-        temperature = hour['temp_c']
-        temp_feel = hour['feelslike_c']
-        weather_code = hour['condition']['code']
-        wind_mph = hour['wind_mph']
-        wind_degree = hour['wind_degree']
-        pressure_mb = hour['pressure_mb']
-        precipitation_mm = hour['precip_mm']
-        humidity = hour['humidity']
-        cloudiness = hour['cloud']
-        uv_index = hour['uv']
-        gust_mph = hour['gust_mph']
+    if response.status_code == 200:
 
-        hourly_dict[time] = {
-            'day_of_week': day_of_week,  # Uncomment if you want to include the day of the week
-            'temperature': temperature,
-            'temp_feel': temp_feel,
-            'weather_code': weather_code,
-            'wind_mph': wind_mph,
-            'wind_degree': wind_degree,
-            'pressure_mb': pressure_mb,
-            'precipitation_mm': precipitation_mm,
-            'humidity': humidity,
-            'cloudiness': cloudiness,
-            'uv_index': uv_index,
-            'gust_mph': gust_mph,
-        }  
+        data = response.json()
+        hourly_data = data["forecast"]["forecastday"][0]["hour"]
+        date_object = datetime.strptime(day, "%Y-%m-%d")
+        day_of_week = date_object.isoweekday()
+        hourly_dict = {}
+        for hour in hourly_data:
+            time = hour['time']
+            temperature = hour['temp_c']
+            temp_feel = hour['feelslike_c']
+            weather_code = hour['condition']['code']
+            wind_mph = hour['wind_mph']
+            wind_degree = hour['wind_degree']
+            pressure_mb = hour['pressure_mb']
+            precipitation_mm = hour['precip_mm']
+            humidity = hour['humidity']
+            cloudiness = hour['cloud']
+            uv_index = hour['uv']
+            gust_mph = hour['gust_mph']
+
+            hourly_dict[time] = {
+                'day_of_week': day_of_week+1,  
+                'temperature': temperature,
+                'temp_feel': temp_feel,
+                'weather_code': weather_code,
+                'wind_mph': wind_mph,
+                'wind_degree': wind_degree,
+                'pressure_mb': pressure_mb,
+                'precipitation_mm': precipitation_mm,
+                'humidity': humidity,
+                'cloudiness': cloudiness,
+                'uv_index': uv_index,
+                'gust_mph': gust_mph,
+            }  
+    else:
+        # Handle the error
+        print(f"Error: API request failed with status code {response.status_code}")
+
+        
     return hourly_dict
 
 
