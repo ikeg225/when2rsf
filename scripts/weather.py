@@ -112,27 +112,52 @@ def get_history(date):
 
     load_dotenv()
 
-    WEATHER_API_KEY = os.getenv('WEATHER_API_KEY')
-
+    #WEATHER_API_KEY = os.getenv('WEATHER_API_KEY')
+    WEATHER_API_KEY = "deb0a1d4b83849728e4215914230610"
+    day = "2022-10-12"
     parameters = {
         'q': 'berkeley',
         'dt': day,
     }
 
     response = requests.get(f'http://api.weatherapi.com/v1/history.json?key={WEATHER_API_KEY}', params = parameters)
+    data = response.json()
+    hourly_data = data["forecast"]["forecastday"][0]["hour"]
+    date_object = datetime.strptime(day, "%Y-%m-%d")
+    day_of_week = date_object.isoweekday()
+    hourly_dict = {}
+    for hour in hourly_data:
+        time = hour['time']
+        temperature = hour['temp_c']
+        temp_feel = hour['feelslike_c']
+        weather_code = hour['condition']['code']
+        wind_mph = hour['wind_mph']
+        wind_degree = hour['wind_degree']
+        pressure_mb = hour['pressure_mb']
+        precipitation_mm = hour['precip_mm']
+        humidity = hour['humidity']
+        cloudiness = hour['cloud']
+        uv_index = hour['uv']
+        gust_mph = hour['gust_mph']
 
-    hourly_forecast = response["forecast"]["forecastday"][0]["hour"]
+        hourly_dict[time] = {
+            'day_of_week': day_of_week,  # Uncomment if you want to include the day of the week
+            'temperature': temperature,
+            'temp_feel': temp_feel,
+            'weather_code': weather_code,
+            'wind_mph': wind_mph,
+            'wind_degree': wind_degree,
+            'pressure_mb': pressure_mb,
+            'precipitation_mm': precipitation_mm,
+            'humidity': humidity,
+            'cloudiness': cloudiness,
+            'uv_index': uv_index,
+            'gust_mph': gust_mph,
+        }  
+    return hourly_dict
 
-    for hour in hourly_forecast:
-        time = hour["time"]
-        temperature_c = hour["temp_c"]
-        condition = hour["condition"]["text"]
-        print(f"Time: {time}, Temperature: {temperature_c}°C, Condition: {condition}")
 
-    return response.text
-
-
-print(get_history("2022-10-03 07:20:00"))
+print(get_history("2022-10-10 07:20:00"))
 
 
 
