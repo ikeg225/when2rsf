@@ -217,6 +217,35 @@ def fill_weather_data_in_rows():
         # Handle exceptions here
         print(f"An error occurred: {str(e)}")   
 
+        def dates(self, timestamp):
+        retrieve = """
+            SELECT
+                DAY(timestamp) AS day,
+                MONTH(timestamp) AS month,
+                YEAR(timestamp) AS year
+            FROM
+                rsf_training;
+            """
+        self.cursor.execute(retrieve)
+            # Fetch the results
+        results = self.cursor.fetchall()
+        extracted_dates = {}
+        for row in results:
+            day, month, year = row
+            extracted_dates.append({'day': day, 'month': month, 'year': year})
+            # Return the list of dictionaries containing day, month, and year
+        return extracted_dates
+    
+    def special_day(day, month, year):
+        return None #continue this 
+    
+        # create dictionary for the special dates 
+        
+    
+    #Make a function that grabs a date, (day, month, and year) and returns if the date is a holiday, school_break, finals_week
+    #week before finals (rrr week), or if is a student event'''
+
+    # what if it is two of the following categories above? write for both 
     
 cockroach = CockroachDB()
 #cockroach.bulk_insert_crowdometer_data(['2022-10-01 07:20:00', '2022-10-01 07:25:00', '2022-10-01 07:30:00', '2022-10-01 07:35:00'], [12, 34, 49, 69], [1, 7, 2, 4])
