@@ -159,7 +159,7 @@ def get_history(date):
     return hourly_dict
 
 
-print(get_history("2022-10-10 07:20:00"))
+#print(get_history("2022-10-10 07:20:00"))
 
 
 
