@@ -20,13 +20,14 @@ def get_current():
     #print(response.text)
     if response.status_code == 200:
         # The request was successful (HTTP 200 OK).
+        
+        # Parse the JSON response
+        data = response.json()
+
         if data['current']['is_day'] == 7:
             day_of_the_week = 1
         else:
             day_of_the_week = data['current']['is_day'] + 1
-        
-        # Parse the JSON response
-        data = response.json()
         # Put data into dictionary
         data_dict = {
             'time' : data['location']['localtime'],
