@@ -1,6 +1,8 @@
 import os
 import psycopg
+import datetime
 from dotenv import load_dotenv
+from weather import get_history
 
 load_dotenv()
 
@@ -57,7 +59,7 @@ class CockroachDB:
 
         data = {
             'time': time,
-            'current_capacity': current_capacity
+            'current_capacity': current_capacity,
             'day_of_the_week': 
             'temperature':
             'temp_feel':
@@ -86,6 +88,43 @@ class CockroachDB:
         
         return rows
 
+    def update_rows(weather_data):
+        update_sql = """
+        UPDATE rsf_training
+        SET temperature = %(temperature)s,
+            temp_feel = %(temp_feel)s,
+            weather_code = %(weather_code)s,
+            wind_mph = %(wind_mph)s,
+            wind_degree = %(wind_degree)s,
+            pressure_mb = %(pressure_mb)s,
+            precipitation_mm = %(precipitation_mm)s,
+            humidity = %(humidity)s,
+            cloudiness = %(cloudiness)s,
+            uv_index = %(uv_index)s,
+            gust_mph = %(gust_mph)s
+        WHERE time = %(time)s
+        """
+
+        with connection.cursor() as cursor:
+            for date, weather_info in weather_data.items():
+                data = {
+                    'temperature': weather_info['temperature'],
+                    'temp_feel': weather_info['temp_feel'],
+                    'weather_code': weather_info['weather_code'],
+                    'wind_mph': weather_info['wind_mph'],
+                    'wind_degree': weather_info['wind_degree'],
+                    'pressure_mb': weather_info['pressure_mb'],
+                    'precipitation_mm': weather_info['precipitation_mm'],
+                    'humidity': weather_info['humidity'],
+                    'cloudiness': weather_info['cloudiness'],
+                    'uv_index': weather_info['uv_index'],
+                    'gust_mph': weather_info['gust_mph'],
+                    'time': date
+                }
+                cursor.execute(update_sql, data)
+        
+        connection.commit()
+
     def bulk_insert_crowdometer_data(self, time_series, current_capacity_series, day_of_week):
         inserts_sql = """
         INSERT INTO rsf_training (time, current_capacity, day_of_week)
@@ -109,6 +148,74 @@ class CockroachDB:
     def delete_rows(self):
         with connection.cursor() as cursor:
             cursor.execute("TRUNCATE rsf_training")
+    
+def fill_weather_data_in_rows():
+    # Retrieve all timestamps from the 'rsf_training' table
+    try:
+        select_timestamps_sql = "SELECT DISTINCT time FROM rsf_training"
+        
+        with connection.cursor() as cursor:
+            cursor.execute(select_timestamps_sql)
+            timestamps = cursor.fetchall()
+
+        # Iterate through the timestamps and fetch weather data for each
+        for timestamp in timestamps:
+            timestamp = timestamp[0]  # Extract the timestamp from the tuple
+
+            # Round the timestamp to the nearest hour
+            rounded_timestamp = timestamp.replace(minute=0, second=0, microsecond=0)
+
+            # Convert the rounded timestamp to a formatted date string
+            date_str = rounded_timestamp.strftime("%Y-%m-%d")
+
+            # Get weather data for the entire day using the 'get_history' function
+            weather_data = get_history(date_str)
+
+            # Extract the hour from the rounded timestamp
+            hour = rounded_timestamp.hour
+
+            # Update the corresponding rows in the 'rsf_training' table with weather data for the hour
+            update_sql = """
+                UPDATE rsf_training
+                SET 'day_of_week' = %(day_of_week)s,
+                    temperature = %(temperature)s,
+                    temp_feel = %(temp_feel)s,
+                    weather_code = %(weather_code)s,
+                    wind_mph = %(wind_mph)s,
+                    wind_degree = %(wind_degree)s,
+                    pressure_mb = %(pressure_mb)s,
+                    precipitation_mm = %(precipitation_mm)s,
+                    humidity = %(humidity)s,
+                    cloudiness = %(cloudiness)s,
+                    uv_index = %(uv_index)s,
+                    gust_mph = %(gust_mph)s
+                WHERE EXTRACT(HOUR FROM time) = %(hour)s
+            """
+
+            with connection.cursor() as cursor:
+                for time, weather_info in weather_data.items():
+                    data = {
+                        'day_of_week' : weather_info['day_of_week'],
+                        'temperature': weather_info['temperature'],
+                        'temp_feel': weather_info['temp_feel'],
+                        'weather_code': weather_info['weather_code'],
+                        'wind_mph': weather_info['wind_mph'],
+                        'wind_degree': weather_info['wind_degree'],
+                        'pressure_mb': weather_info['pressure_mb'],
+                        'precipitation_mm': weather_info['precipitation_mm'],
+                        'humidity': weather_info['humidity'],
+                        'cloudiness': weather_info['cloudiness'],
+                        'uv_index': weather_info['uv_index'],
+                        'gust_mph': weather_info['gust_mph'],
+                        'hour': hour,  # Use the hour extracted from the timestamp
+                    }
+                    cursor.execute(update_sql, data)
+
+        # Commit the changes to the database
+        connection.commit()
+    except Exception as e:
+        # Handle exceptions here
+        print(f"An error occurred: {str(e)}")   
 
     
 cockroach = CockroachDB()
