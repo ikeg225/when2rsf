@@ -147,7 +147,8 @@ class CockroachDB:
 
     def delete_rows(self):
         with connection.cursor() as cursor:
-            cursor.execute("TRUNCATE rsf_training")
+            cursor.execute("DELETE FROM rsf_training")
+            connection.commit()
     
 def fill_weather_data_in_rows():
     # Retrieve all timestamps from the 'rsf_training' table
@@ -250,4 +251,4 @@ def fill_weather_data_in_rows():
 cockroach = CockroachDB()
 #cockroach.bulk_insert_crowdometer_data(['2022-10-01 07:20:00', '2022-10-01 07:25:00', '2022-10-01 07:30:00', '2022-10-01 07:35:00'], [12, 34, 49, 69], [1, 7, 2, 4])
 #cockroach.delete_rows()
-print(len(cockroach.get_all_rows()))
+#print(len(cockroach.get_all_rows()))
