@@ -3,6 +3,8 @@ import json
 import time
 from datetime import datetime, timedelta
 from dotenv import load_dotenv
+from cockroachdb import *
+from weather import get_current
 
 def send_api_request(): 
     url = "https://api.density.io/v2/displays/dsp_956223069054042646" 
@@ -59,7 +61,12 @@ def wait_for_next_multiple_of_5_minutes():
         # Call find_count() and return the output
         next_time += timedelta(minutes=1)
         data = retrieve_request()
-        print(find_count(data))
+        find_count(data)
 
 #print(find_count(retrieve_request()))
-wait_for_next_multiple_of_5_minutes()
+print(wait_for_next_multiple_of_5_minutes())
+print(find_count(retrieve_request))
+
+
+
+
