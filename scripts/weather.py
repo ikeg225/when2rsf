@@ -20,13 +20,17 @@ def get_current():
     #print(response.text)
     if response.status_code == 200:
         # The request was successful (HTTP 200 OK).
+        if data['current']['is_day'] == 7:
+            day_of_the_week = 1
+        else:
+            day_of_the_week = data['current']['is_day'] + 1
         
         # Parse the JSON response
         data = response.json()
         # Put data into dictionary
         data_dict = {
             'time' : data['location']['localtime'],
-            'day_of_the_week' : data['current']['is_day'] + 1,
+            'day_of_the_week' : day_of_the_week,
             'temperature' : data['current']['temp_f'],
             #'description' : data['current']['condition']['text'],
             'temp_feel' : data['current']['feelslike_f'],
@@ -109,7 +113,6 @@ def get_history(date):
 
     #WEATHER_API_KEY = os.getenv('WEATHER_API_KEY')
     WEATHER_API_KEY = "deb0a1d4b83849728e4215914230610"
-    day = "2022-10-12"
     parameters = {
         'q': 'berkeley',
         'dt': day,
@@ -137,8 +140,13 @@ def get_history(date):
             uv_index = hour['uv']
             gust_mph = hour['gust_mph']
 
+            if day_of_week == 7:
+                day_of_week = 1
+            else:
+                day_of_week += 1
+
             hourly_dict[time] = {
-                'day_of_week': day_of_week+1,  
+                'day_of_week': day_of_week,  
                 'temperature': temperature,
                 'temp_feel': temp_feel,
                 'weather_code': weather_code,
