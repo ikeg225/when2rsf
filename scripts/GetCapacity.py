@@ -74,11 +74,11 @@ def update_every_5_min():
     while True:
         # Get the current time
         now = datetime.now()
-        print(now)
+        #print(now)
 
         # Calculate the next multiple of 5 minutes that is also at the first minute of the hour
-        next_time = now + timedelta(minutes=5 - now.minute % 5, seconds=-now.second, microseconds=-now.microsecond)
-        print(next_time)
+        next_time = now + timedelta(minutes=1 - now.minute % 1, seconds=-now.second, microseconds=-now.microsecond)
+        #print(next_time)
 
         # Wait until the next multiple of 5 minutes that is also at the first minute of the hour
         time.sleep((next_time - now).total_seconds())
@@ -90,10 +90,10 @@ def update_every_5_min():
         print(weather_data.keys())
         curr_time = datetime.now() 
         current_capacity = find_count(retrieve_request())  
-        day_of_the_week = weather_data.get('day_of_the_week')
+        day_of_week = weather_data.get('day_of_the_week')
         temperature = weather_data.get('temperature')
         temp_feel = weather_data.get('temp_feel')
-        weather = weather_data.get('weather_code')
+        weather_code = weather_data.get('weather_code')
         wind_mph = weather_data.get('wind_mph') 
         wind_degree = weather_data.get('wind_degree') 
         pressure_mb = weather_data.get('pressure_mb') 
@@ -103,14 +103,17 @@ def update_every_5_min():
         uv_index = weather_data.get('uv_index')
         gust_mph = weather_data.get('gust_mph')
 
-        print(day_of_the_week)
+        #print(weather_data.values())
         
         #Insert data into cockroach database 
 
         cockroach.insert_only_crowdometer_data(
-            curr_time, current_capacity, day_of_the_week, temperature, temp_feel, weather, wind_mph,
+            curr_time, current_capacity, day_of_week, temperature, temp_feel, weather_code, wind_mph,
             wind_degree, pressure_mb, precipitation_mm, humidity, cloudiness, uv_index, gust_mph
             )
 
 #print(update_every_5_min())
-print(get_current())
+#print(get_current().keys())
+#print(get_current().values())
+#print(cockroach.get_all_rows())
+

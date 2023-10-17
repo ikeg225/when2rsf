@@ -48,21 +48,23 @@ class CockroachDB:
     
 
     def insert_only_crowdometer_data(self, 
-    time, current_capacity, day_of_the_week, temperature, temp_feel, weather, wind_mph,
+    time, current_capacity, day_of_week, temperature, temp_feel, weather_code, wind_mph,
     wind_degree, pressure_mb, precipitation_mm, humidity, cloudiness, uv_index, gust_mph
     ):
         insert_sql = """
-        INSERT INTO rsf_training (time, current_capacity)
-        VALUES (%(time)s, %(current_capacity)s)
+        INSERT INTO rsf_training (time, current_capacity, day_of_week, temperature, temp_feel, weather_code, wind_mph, wind_degree, 
+        pressure_mb, precipitation_mm, humidity, cloudiness, uv_index, gust_mph)
+        VALUES (%(time)s, %(current_capacity)s, %(day_of_week)s, %(temperature)s, %(temp_feel)s, %(weather_code)s, %(wind_mph)s, 
+         %(wind_degree)s, %(pressure_mb)s, %(precipitation_mm)s, %(humidity)s, %(cloudiness)s, %(uv_index)s, %(gust_mph)s)
         """
 
         data = {
             'time': time,
             'current_capacity': current_capacity,
-            'day_of_the_week': day_of_the_week, 
+            'day_of_week': day_of_week, 
             'temperature': temperature,
             'temp_feel': temp_feel,
-            'weather': weather,
+            'weather_code': weather_code,
             'wind_mph': wind_mph,
             'wind_degree': wind_degree,
             'pressure_mb': pressure_mb,
@@ -80,7 +82,7 @@ class CockroachDB:
         connection.commit()
     
     def get_all_rows(self):
-        select_sql = "SELECT * FROM rsf_training"
+        select_sql = "SELECT * FROM rsf_training ORDER BY time DESC LIMIT 1 "
 
         with connection.cursor() as cursor:
             cursor.execute(select_sql)
@@ -182,23 +184,23 @@ def fill_weather_data_in_rows():
         print(f"An error occurred: {str(e)}")   
 
         def dates(self, timestamp):
-        retrieve = """
-            SELECT
-                DAY(timestamp) AS day,
-                MONTH(timestamp) AS month,
-                YEAR(timestamp) AS year
-            FROM
-                rsf_training;
-            """
-        self.cursor.execute(retrieve)
-            # Fetch the results
-        results = self.cursor.fetchall()
-        extracted_dates = {}
-        for row in results:
-            day, month, year = row
-            extracted_dates.append({'day': day, 'month': month, 'year': year})
-            # Return the list of dictionaries containing day, month, and year
-        return extracted_dates
+            retrieve = """
+                SELECT
+                    DAY(timestamp) AS day,
+                    MONTH(timestamp) AS month,
+                    YEAR(timestamp) AS year
+                FROM
+                    rsf_training;
+                """
+            self.cursor.execute(retrieve)
+                # Fetch the results
+            results = self.cursor.fetchall()
+            extracted_dates = {}
+            for row in results:
+                day, month, year = row
+                extracted_dates.append({'day': day, 'month': month, 'year': year})
+                # Return the list of dictionaries containing day, month, and year
+            return extracted_dates
     
     def special_day(day, month, year):
         # Fall 2022
