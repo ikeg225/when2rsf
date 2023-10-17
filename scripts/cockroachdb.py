@@ -201,6 +201,116 @@ def fill_weather_data_in_rows():
         return extracted_dates
     
     def special_day(day, month, year):
+        # Fall 2022
+        {day: 3, month: 9, year: 2022, 'is_student_event': True} 
+        {day: 5, month: 9, year: 2022, 'is_holiday': True} 
+        {day: 10, month: 9, year: 2022, 'is_student_event': True} 
+        {day: 24, month: 9, year: 2022, 'is_student_event': True} 
+        {day: 22, month: 10, year: 2022, 'is_student_event': True} 
+        {day: 29, month: 10, year: 2022, 'is_student_event': True} 
+        {day: 11, month: 11, year: 2022, 'is_holiday': True} 
+        {day: 19, month: 11, year: 2022, 'is_student_event': True} 
+        {day: 23, month: 11, year: 2022, 'school_break': True} 
+        {day: 24, month: 11, year: 2022, 'school_break': True} 
+        {day: 25, month: 11, year: 2022, 'school_break': True, 'is_student_event': True} 
+        {day: 26, month: 11, year: 2022, 'school_break': True} 
+        {day: 27, month: 11, year: 2022, 'school_break': True} 
+        {day: 5, month: 12, year: 2022, 'is_rrr_week': True}
+        {day: 6, month: 12, year: 2022, 'is_rrr_week': True}
+        {day: 7, month: 12, year: 2022, 'is_rrr_week': True}
+        {day: 8, month: 12, year: 2022, 'is_rrr_week': True}
+        {day: 9, month: 12, year: 2022, 'is_rrr_week': True}
+        {day: 12, month: 12, year: 2022, 'is_finals_week': True}
+        {day: 13, month: 12, year: 2022, 'is_finals_week': True}
+        {day: 14, month: 12, year: 2022, 'is_finals_week': True}
+        {day: 15, month: 12, year: 2022, 'is_finals_week': True}
+        {day: 16, month: 12, year: 2022, 'is_finals_week': True}
+        {day: 17, month: 12, year: 2022, 'is_student_event': True}
+        {day: 23, month: 12, year: 2022, 'is_holiday': True} 
+        {day: 26, month: 12, year: 2022, 'is_holiday': True}
+        {day: 30, month: 12, year: 2022, 'is_holiday': True}
+        {day: 2, month: 1, year: 2023, 'is_holiday': True}
+        # Spring 2023
+        {day: 16, month: 1, year: 2023, 'is_holiday': True}
+        {day: 25, month: 2, year: 2023, 'is_holiday': True}
+        {day: 26, month: 3, year: 2023, 'school_break': True}
+        {day: 2, month: 3, year: 2023, 'school_break': True}
+        {day: 27, month: 3, year: 2023, 'school_break': True}
+        {day: 28, month: 3, year: 2023, 'school_break': True}
+        {day: 29, month: 3, year: 2023, 'school_break': True}
+        {day: 30, month: 3, year: 2023, 'school_break': True}
+        {day: 31, month: 3, year: 2023, 'school_break': True}
+        {day: 1, month: 4, year: 2023, 'school_break': True}
+        {day: 2, month: 4, year: 2023, 'school_break': True}
+        {day: 22, month: 4, year: 2023, 'is_student_event': True}
+        {day: 1, month: 5, year: 2023, 'is_rrr_week': True}
+        {day: 2, month: 5, year: 2023, 'is_rrr_week': True}
+        {day: 3, month: 5, year: 2023, 'is_rrr_week': True}
+        {day: 4, month: 5, year: 2023, 'is_rrr_week': True}
+        {day: 5, month: 5, year: 2023, 'is_rrr_week': True}
+        {day: 8, month: 5, year: 2023, 'is_finals_week': True}
+        {day: 9, month: 5, year: 2023, 'is_finals_week': True}
+        {day: 10, month: 5, year: 2023, 'is_finals_week': True}
+        {day: 11, month: 5, year: 2023, 'is_finals_week': True}
+        {day: 12, month: 5, year: 2023, 'is_finals_week': True}
+        {day: 13, month: 5, year: 2023, 'is_student_event': True}
+        {day: 29, month: 5, year: 2023, 'is_holiday': True}
+        # Summer 2023
+        {day: 19, month: 6, year: 2023, 'is_holiday': True}
+        {day: 4, month: 7, year: 2023, 'is_holiday': True}
+        # Fall 2023
+        {day: 4, month: 9, year: 2023, 'is_holiday': True}
+        {day: 9, month: 9, year: 2023, 'is_student_event': True}
+        {day: 16, month: 9, year: 2023, 'is_student_event': True}
+        {day: 30, month: 9, year: 2023, 'is_student_event': True}
+        {day: 7, month: 10, year: 2023, 'is_student_event': True}
+        {day: 28, month: 10, year: 2023, 'is_student_event': True}
+        {day: 10, month: 11, year: 2023, 'is_holiday': True}
+        {day: 11, month: 11, year: 2023, 'is_student_event': True}
+        {day: 22, month: 11, year: 2023, 'school_break': True}
+        {day: 23, month: 11, year: 2023, 'school_break': True}
+        {day: 24, month: 11, year: 2023, 'school_break': True}
+        {day: 25, month: 11, year: 2023, 'school_break': True}
+        {day: 26, month: 11, year: 2023, 'school_break': True}
+        {day: 4, month: 12, year: 2023, 'is_rrr_week': True}
+        {day: 5, month: 12, year: 2023, 'is_rrr_week': True}
+        {day: 6, month: 12, year: 2023, 'is_rrr_week': True}
+        {day: 7, month: 12, year: 2023, 'is_rrr_week': True}
+        {day: 8, month: 12, year: 2023, 'is_rrr_week': True}
+        {day: 11, month: 12, year: 2023, 'is_finals_week': True}
+        {day: 12, month: 12, year: 2023, 'is_finals_week': True}
+        {day: 13, month: 12, year: 2023, 'is_finals_week': True}
+        {day: 14, month: 12, year: 2023, 'is_finals_week': True}
+        {day: 15, month: 12, year: 2023, 'is_finals_week': True}
+        {day: 15, month: 12, year: 2023, 'is_student_event': True}
+        {day: 25, month: 12, year: 2023, 'is_holiday': True}
+        {day: 26, month: 12, year: 2023, 'is_holiday': True}
+        {day: 1, month: 1, year: 2024, 'is_holiday': True}
+        {day: 2, month: 1, year: 2024, 'is_holiday': True}
+        # Spring 2024
+        {day: 15, month: 1, year: 2024, 'is_holiday': True}
+        {day: 19, month: 2, year: 2024, 'is_holiday': True}
+        {day: 23, month: 3, year: 2024, 'school_break': True}
+        {day: 24, month: 3, year: 2024, 'school_break': True}
+        {day: 25, month: 3, year: 2024, 'school_break': True}
+        {day: 26, month: 3, year: 2024, 'school_break': True}
+        {day: 27, month: 3, year: 2024, 'school_break': True}
+        {day: 28, month: 3, year: 2024, 'school_break': True}
+        {day: 29, month: 3, year: 2024, 'school_break': True}
+        {day: 30, month: 3, year: 2024, 'school_break': True}
+        {day: 31, month: 3, year: 2024, 'school_break': True}
+        # {Cal Day TBD}
+        {day: 29, month: 4, year: 2024, 'is_rrr_week': True}
+        {day: 30, month: 4, year: 2024, 'is_rrr_week': True}
+        {day: 1, month: 5, year: 2024, 'is_rrr_week': True}
+        {day: 2, month: 5, year: 2024, 'is_rrr_week': True}
+        {day: 3, month: 5, year: 2024, 'is_rrr_week': True}
+        {day: 6, month: 5, year: 2024, 'is_finals_week': True}
+        {day: 7, month: 5, year: 2024, 'is_finals_week': True}
+        {day: 8, month: 5, year: 2024, 'is_finals_week': True}
+        {day: 9, month: 5, year: 2024, 'is_finals_week': True}
+        {day: 10, month: 5, year: 2024, 'is_finals_week': True}
+        {day: 11, month: 5, year: 2024, 'is_student_event': True}
         return None #continue this 
     
         # create dictionary for the special dates 
