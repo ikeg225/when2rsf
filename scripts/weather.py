@@ -24,14 +24,13 @@ def get_current():
         # Parse the JSON response
         data = response.json()
 
-        if data['current']['is_day'] == 7:
-            day_of_the_week = 1
-        else:
-            day_of_the_week = data['current']['is_day'] + 1
+        now = datetime.now()
+        day_index = now.weekday()
+        days = [2, 3, 4, 5, 6, 7, 1]
         # Put data into dictionary
         data_dict = {
             'time' : data['location']['localtime'],
-            'day_of_the_week' : day_of_the_week,
+            'day_of_the_week' : days[day_index],
             'temperature' : data['current']['temp_f'],
             #'description' : data['current']['condition']['text'],
             'temp_feel' : data['current']['feelslike_f'],

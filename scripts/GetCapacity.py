@@ -112,4 +112,5 @@ def update_every_5_min():
             wind_degree, pressure_mb, precipitation_mm, humidity, cloudiness, uv_index, gust_mph
             )
 
-print(update_every_5_min())
+#print(update_every_5_min())
+print(get_current())
