@@ -115,6 +115,22 @@ class CockroachDB:
             cursor.execute("DELETE FROM rsf_training")
             connection.commit()
     
+    def delete_on_timestamp(self, timestamp):
+        # Create a cursor
+        cursor = connection.cursor()
+
+        # Define the DELETE statement
+        delete_query = "DELETE FROM rsf_training WHERE time = %s"
+
+        # Execute the DELETE statement with the provided timestamp
+        cursor.execute(delete_query, (timestamp,))
+
+        # Commit the transaction
+        connection.commit()
+
+        # Close the cursor and the connection
+        cursor.close()
+    
 def fill_weather_data_in_rows():
     # Retrieve all timestamps from the 'rsf_training' table
     try:
