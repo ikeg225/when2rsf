@@ -59,7 +59,7 @@ def update_every_5_min():
         #print(now)
 
         # Calculate the next multiple of 5 minutes that is also at the first minute of the hour
-        next_time = now + timedelta(minutes=1 - now.minute % 1, seconds=-now.second, microseconds=-now.microsecond)
+        next_time = now + timedelta(minutes=5 - now.minute % 5, seconds=-now.second, microseconds=-now.microsecond)
         #print(next_time)
 
         # Wait until the next multiple of 5 minutes that is also at the first minute of the hour

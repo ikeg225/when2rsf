@@ -1,6 +1,7 @@
 import os
 import psycopg
 from dotenv import load_dotenv
+import datetime 
 
 load_dotenv()
 
@@ -82,7 +83,7 @@ class CockroachDB:
         connection.commit()
     
     def get_all_rows(self):
-        select_sql = "SELECT * FROM rsf_training ORDER BY time DESC LIMIT 1 "
+        select_sql = "SELECT * FROM rsf_training ORDER BY time DESC LIMIT 5"
 
         with connection.cursor() as cursor:
             cursor.execute(select_sql)
@@ -343,3 +344,4 @@ cockroach = CockroachDB()
 #cockroach.bulk_insert_crowdometer_data(['2022-10-01 07:20:00', '2022-10-01 07:25:00', '2022-10-01 07:30:00', '2022-10-01 07:35:00'], [12, 34, 49, 69], [1, 7, 2, 4])
 #cockroach.delete_rows()
 #print(len(cockroach.get_all_rows()))
+print(cockroach.get_all_rows())
