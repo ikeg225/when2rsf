@@ -1,10 +1,6 @@
 import requests 
-import os
-import json 
-import psycopg2
 import time
 from datetime import datetime, timedelta
-from dotenv import load_dotenv
 from weather import get_current
 from cockroachdb import CockroachDB
 
@@ -42,33 +38,19 @@ def find_count(request):
 
 # Check if the key was found in the dictionary
     if current_count_value is not None:
-        print("Value associated with 'current_count':", current_count_value)
         return current_count_value
     else:
         print("Key 'current_count' not found in the dictionary.") 
 
-
-def wait_for_next_multiple_of_5_minutes():
-    while True:
-        # Get the current time
-        now = datetime.now()
-        print(now)
-
-        # Calculate the next multiple of 5 minutes that is also at the first minute of the hour
-        next_time = now + timedelta(minutes=5 - now.minute % 5, seconds=-now.second, microseconds=-now.microsecond)
-        print(next_time)
-
-        # Wait until the next multiple of 5 minutes that is also at the first minute of the hour
-        time.sleep((next_time - now).total_seconds())
-
-        # Call find_count() and return the output
-        next_time += timedelta(minutes=1)
-        data = retrieve_request()
-        find_count(data)
-
-#print(find_count(retrieve_request()))
-#print(wait_for_next_multiple_of_5_minutes())
-#print(find_count(retrieve_request))
+def round_to_nearest_5_minutes(dt):
+    minute = dt.minute
+    if minute % 5 < 2.5:
+        # Round down to the nearest 5 minutes
+        dt -= timedelta(minutes=minute % 5)
+    else:
+        # Round up to the nearest 5 minutes
+        dt += timedelta(minutes=5 - minute % 5)
+    return dt.replace(second=0, microsecond=0)
 
 def update_every_5_min():
     while True:
@@ -87,8 +69,8 @@ def update_every_5_min():
 
         next_time += timedelta(minutes=1)
         weather_data = get_current() 
-        print(weather_data.keys())
-        curr_time = datetime.now() 
+
+        curr_time = round_to_nearest_5_minutes(datetime.now())
         current_capacity = find_count(retrieve_request())  
         day_of_week = weather_data.get('day_of_the_week')
         temperature = weather_data.get('temperature')
@@ -110,10 +92,7 @@ def update_every_5_min():
         cockroach.insert_only_crowdometer_data(
             curr_time, current_capacity, day_of_week, temperature, temp_feel, weather_code, wind_mph,
             wind_degree, pressure_mb, precipitation_mm, humidity, cloudiness, uv_index, gust_mph
-            )
+        )
 
-#print(update_every_5_min())
-#print(get_current().keys())
-#print(get_current().values())
-#print(cockroach.get_all_rows())
-
+while True:
+    update_every_5_min()
