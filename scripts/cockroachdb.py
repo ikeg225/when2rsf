@@ -1,11 +1,11 @@
 import os
-import psycopg
+import psycopg2
 from dotenv import load_dotenv
 import datetime 
 
 load_dotenv()
 
-connection = psycopg.connect(os.environ["CONNECTION_STRING"])
+connection = psycopg2.connect(os.environ["CONNECTION_STRING"])
 
 class CockroachDB:
     def create_rsf_crowdometer(self):
@@ -49,8 +49,8 @@ class CockroachDB:
     
 
     def insert_only_crowdometer_data(self, 
-    time, current_capacity, day_of_week, temperature, temp_feel, weather_code, wind_mph,
-    wind_degree, pressure_mb, precipitation_mm, humidity, cloudiness, uv_index, gust_mph
+        time, current_capacity, day_of_week, temperature, temp_feel, weather_code, wind_mph,
+        wind_degree, pressure_mb, precipitation_mm, humidity, cloudiness, uv_index, gust_mph
     ):
         insert_sql = """
         INSERT INTO rsf_training (time, current_capacity, day_of_week, temperature, temp_feel, weather_code, wind_mph, wind_degree, 

@@ -4,7 +4,6 @@ from datetime import datetime, timedelta
 from weather import get_current
 from cockroachdb import CockroachDB
 
-
 cockroach = CockroachDB()
 
 def send_api_request(): 
