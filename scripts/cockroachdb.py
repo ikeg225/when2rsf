@@ -1,13 +1,14 @@
 import os
-import psycopg2
+import psycopg
 from dotenv import load_dotenv
 import datetime 
 
 load_dotenv()
 
-connection = psycopg2.connect(os.environ["CONNECTION_STRING"])
-
 class CockroachDB:
+    def __init__(self):
+        self.connection = psycopg.connect(os.environ["CONNECTION_STRING"])
+
     def create_rsf_crowdometer(self):
         create_table_sql = """
             CREATE TABLE IF NOT EXISTS rsf_training (
@@ -34,18 +35,18 @@ class CockroachDB:
             );
         """
 
-        with connection.cursor() as cursor:
+        with self.connection.cursor() as cursor:
             cursor.execute(create_table_sql)
 
-        connection.commit()
+        self.connection.commit()
     
     def drop_table(self, table_name):
         drop_table_sql = f"DROP TABLE IF EXISTS {table_name}"
 
-        with connection.cursor() as cursor:
+        with self.connection.cursor() as cursor:
             cursor.execute(drop_table_sql)
         
-        connection.commit()
+        self.connection.commit()
     
 
     def insert_only_crowdometer_data(self, 
@@ -77,15 +78,15 @@ class CockroachDB:
 
         }
 
-        with connection.cursor() as cursor:
+        with self.connection.cursor() as cursor:
             cursor.execute(insert_sql, data)
         
-        connection.commit()
+        self.connection.commit()
     
     def get_all_rows(self):
         select_sql = "SELECT * FROM rsf_training ORDER BY time DESC LIMIT 5"
 
-        with connection.cursor() as cursor:
+        with self.connection.cursor() as cursor:
             cursor.execute(select_sql)
             rows = cursor.fetchall()
         
@@ -104,21 +105,21 @@ class CockroachDB:
 
         data_batches = [big_data[i:i + batch_size] for i in range(0, len(big_data), batch_size)]
 
-        with connection.cursor() as cursor:
+        with self.connection.cursor() as cursor:
             for batch in data_batches:
                 batch_dict = [{'time': row[0], 'current_capacity': row[1], 'day_of_week': row[2]} for row in batch]
                 cursor.executemany(inserts_sql, batch_dict)
-                connection.commit()
+                self.connection.commit()
                 print(batch_dict)
 
     def delete_rows(self):
-        with connection.cursor() as cursor:
+        with self.connection.cursor() as cursor:
             cursor.execute("DELETE FROM rsf_training")
-            connection.commit()
+            self.connection.commit()
     
     def delete_on_timestamp(self, timestamp):
         # Create a cursor
-        cursor = connection.cursor()
+        cursor = self.connection.cursor()
 
         # Define the DELETE statement
         delete_query = "DELETE FROM rsf_training WHERE time = %s"
@@ -127,7 +128,7 @@ class CockroachDB:
         cursor.execute(delete_query, (timestamp,))
 
         # Commit the transaction
-        connection.commit()
+        self.connection.commit()
 
         # Close the cursor and the connection
         cursor.close()
@@ -137,7 +138,7 @@ def fill_weather_data_in_rows():
     try:
         select_timestamps_sql = "SELECT DISTINCT time FROM rsf_training"
         
-        with connection.cursor() as cursor:
+        with self.connection.cursor() as cursor:
             cursor.execute(select_timestamps_sql)
             timestamps = cursor.fetchall()
 
@@ -175,7 +176,7 @@ def fill_weather_data_in_rows():
                 WHERE EXTRACT(HOUR FROM time) = %(hour)s
             """
 
-            with connection.cursor() as cursor:
+            with self.connection.cursor() as cursor:
                 for time, weather_info in weather_data.items():
                     data = {
                         'day_of_week' : weather_info['day_of_week'],
@@ -195,7 +196,7 @@ def fill_weather_data_in_rows():
                     cursor.execute(update_sql, data)
 
         # Commit the changes to the database
-        connection.commit()
+        self.connection.commit()
     except Exception as e:
         # Handle exceptions here
         print(f"An error occurred: {str(e)}")   
@@ -340,8 +341,9 @@ def fill_weather_data_in_rows():
 
     # what if it is two of the following categories above? write for both 
     
-cockroach = CockroachDB()
-#cockroach.bulk_insert_crowdometer_data(['2022-10-01 07:20:00', '2022-10-01 07:25:00', '2022-10-01 07:30:00', '2022-10-01 07:35:00'], [12, 34, 49, 69], [1, 7, 2, 4])
-#cockroach.delete_rows()
-#print(len(cockroach.get_all_rows()))
-# print(cockroach.get_all_rows())
+if __name__ == "__main__":
+    cockroach = CockroachDB()
+    #cockroach.bulk_insert_crowdometer_data(['2022-10-01 07:20:00', '2022-10-01 07:25:00', '2022-10-01 07:30:00', '2022-10-01 07:35:00'], [12, 34, 49, 69], [1, 7, 2, 4])
+    #cockroach.delete_rows()
+    #print(len(cockroach.get_all_rows()))
+    print(cockroach.get_all_rows())
