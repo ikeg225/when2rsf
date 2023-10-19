@@ -133,16 +133,16 @@ class CockroachDB:
         # Close the cursor and the connection
         cursor.close()
 
-    def backfill_dates(self, timestamps, event):
+    def backfill_dates(self, timestamps, event, event_value):
         query = """
             UPDATE rsf_training
-            SET {event} = true
+            SET {event} = %(event_value)s
             WHERE rsf_training.time = %(timestamp)s
         """.format(event=event)
 
         with self.connection.cursor() as cursor:
             for timestamp in timestamps:
-                cursor.execute(query, {'timestamp': timestamp})
+                cursor.execute(query, {'timestamp': timestamp, 'event_value': event_value})
         self.connection.commit()
     
 def fill_weather_data_in_rows():
