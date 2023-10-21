@@ -2,6 +2,7 @@ import os
 import psycopg
 from dotenv import load_dotenv
 import datetime 
+import pandas as pd
 
 load_dotenv()
 
@@ -144,7 +145,132 @@ class CockroachDB:
             for timestamp in timestamps:
                 cursor.execute(query, {'timestamp': timestamp, 'event_value': event_value})
         self.connection.commit()
-    
+    def special_day(self, timestamp):
+        # Fall 2022
+        special_days_dictionary = [{'day': 3, 'month': 9, 'year': 2022, 'event': 'is_student_event'},
+        {'day': 5, 'month': 9, 'year': 2022, 'event': 'is_holiday'}, 
+        {'day': 10, 'month': 9, 'year': 2022, 'event': 'is_student_event'}, 
+        {'day': 24, 'month': 9, 'year': 2022, 'event': 'is_student_event'}, 
+        {'day': 22, 'month': 10, 'year': 2022, 'event': 'is_student_event'}, 
+        {'day': 29, 'month': 10, 'year': 2022, 'event': 'is_student_event'}, 
+        {'day': 11, 'month': 11, 'year': 2022, 'event': 'is_holiday'}, 
+        {'day': 19, 'month': 11, 'year': 2022, 'event': 'is_student_event'}, 
+        {'day': 23, 'month': 11, 'year': 2022, 'event': 'school_break'}, 
+        {'day': 24, 'month': 11, 'year': 2022, 'event': 'school_break'}, 
+        {'day': 25, 'month': 11, 'year': 2022, 'event': ['school_break', 'is_student_event']}, 
+        {'day': 26, 'month': 11, 'year': 2022, 'event': 'school_break'}, 
+        {'day': 27, 'month': 11, 'year': 2022, 'event': 'school_break'}, 
+        {'day': 5, 'month': 12, 'year': 2022, 'event': 'is_rrr_week'},
+        {'day': 6, 'month': 12, 'year': 2022, 'event': 'is_rrr_week'},
+        {'day': 7, 'month': 12, 'year': 2022, 'event': 'is_rrr_week'},
+        {'day': 8, 'month': 12, 'year': 2022, 'event': 'is_rrr_week'},
+        {'day': 9, 'month': 12, 'year': 2022, 'event': 'is_rrr_week'},
+        {'day': 12, 'month': 12, 'year': 2022, 'event': 'is_finals_week'},
+        {'day': 13, 'month': 12, 'year': 2022, 'event': 'is_finals_week'},
+        {'day': 14, 'month': 12, 'year': 2022, 'event': 'is_finals_week'},
+        {'day': 15, 'month': 12, 'year': 2022, 'event': 'is_finals_week'},
+        {'day': 16, 'month': 12, 'year': 2022, 'event': 'is_finals_week'},
+        {'day': 17, 'month': 12, 'year': 2022, 'event': 'is_student_event'},
+        {'day': 23, 'month': 12, 'year': 2022, 'event': 'is_holiday'}, 
+        {'day': 26, 'month': 12, 'year': 2022, 'event': 'is_holiday'},
+        {'day': 30, 'month': 12, 'year': 2022, 'event': 'is_holiday'},
+        {'day': 2, 'month': 1, 'year': 2023, 'event': 'is_holiday'},
+        # Spring 2023
+        {'day': 16, 'month': 1, 'year': 2023, 'event': 'is_holiday'},
+        {'day': 25, 'month': 2, 'year': 2023, 'event': 'is_holiday'},
+        {'day': 26, 'month': 3, 'year': 2023, 'event': 'school_break'},
+        {'day': 2, 'month': 3, 'year': 2023, 'event': 'school_break'},
+        {'day': 27, 'month': 3, 'year': 2023, 'event': 'school_break'},
+        {'day': 28, 'month': 3, 'year': 2023, 'event': 'school_break'},
+        {'day': 29, 'month': 3, 'year': 2023, 'event': 'school_break'},
+        {'day': 30, 'month': 3, 'year': 2023, 'event': 'school_break'},
+        {'day': 31, 'month': 3, 'year': 2023, 'event': 'school_break'},
+        {'day': 1, 'month': 4, 'year': 2023, 'event': 'school_break'},
+        {'day': 2, 'month': 4, 'year': 2023, 'event': 'school_break'},
+        {'day': 22, 'month': 4, 'year': 2023, 'event': 'is_student_event'},
+        {'day': 1, 'month': 5, 'year': 2023, 'event': 'is_rrr_week'},
+        {'day': 2, 'month': 5, 'year': 2023, 'event': 'is_rrr_week'},
+        {'day': 3, 'month': 5, 'year': 2023, 'event': 'is_rrr_week'},
+        {'day': 4, 'month': 5, 'year': 2023, 'event': 'is_rrr_week'},
+        {'day': 5, 'month': 5, 'year': 2023, 'event': 'is_rrr_week'},
+        {'day': 8, 'month': 5, 'year': 2023, 'event': 'is_finals_week'},
+        {'day': 9, 'month': 5, 'year': 2023, 'event': 'is_finals_week'},
+        {'day': 10, 'month': 5, 'year': 2023, 'event': 'is_finals_week'},
+        {'day': 11, 'month': 5, 'year': 2023, 'event': 'is_finals_week'},
+        {'day': 12, 'month': 5, 'year': 2023, 'event': 'is_finals_week'},
+        {'day': 13, 'month': 5, 'year': 2023, 'event': 'is_student_event'},
+        {'day': 29, 'month': 5, 'year': 2023, 'event': 'is_holiday'},
+        # Summer 2023
+        {'day': 19, 'month': 6, 'year': 2023, 'event': 'is_holiday'},
+        {'day': 4, 'month': 7, 'year': 2023, 'event': 'is_holiday'},
+        # Fall 2023
+        {'day': 4, 'month': 9, 'year': 2023, 'event': 'is_holiday'},
+        {'day': 9, 'month': 9, 'year': 2023, 'event': 'is_student_event'},
+        {'day': 16, 'month': 9, 'year': 2023, 'event': 'is_student_event'},
+        {'day': 30, 'month': 9, 'year': 2023, 'event': 'is_student_event'},
+        {'day': 7, 'month': 10, 'year': 2023, 'event': 'is_student_event'},
+        {'day': 28, 'month': 10, 'year': 2023, 'event': 'is_student_event'},
+        {'day': 10, 'month': 11, 'year': 2023, 'event': 'is_holiday'},
+        {'day': 11, 'month': 11, 'year': 2023, 'event': 'is_student_event'},
+        {'day': 22, 'month': 11, 'year': 2023, 'event': 'school_break'},
+        {'day': 23, 'month': 11, 'year': 2023, 'event': 'school_break'},
+        {'day': 24, 'month': 11, 'year': 2023, 'event': 'school_break'},
+        {'day': 25, 'month': 11, 'year': 2023, 'event': 'school_break'},
+        {'day': 26, 'month': 11, 'year': 2023, 'event': 'school_break'},
+        {'day': 4, 'month': 12, 'year': 2023, 'event': 'is_rrr_week'},
+        {'day': 5, 'month': 12, 'year': 2023, 'event': 'is_rrr_week'},
+        {'day': 6, 'month': 12, 'year': 2023, 'event': 'is_rrr_week'},
+        {'day': 7, 'month': 12, 'year': 2023, 'event': 'is_rrr_week'},
+        {'day': 8, 'month': 12, 'year': 2023, 'event': 'is_rrr_week'},
+        {'day': 11, 'month': 12, 'year': 2023, 'event': 'is_finals_week'},
+        {'day': 12, 'month': 12, 'year': 2023, 'event': 'is_finals_week'},
+        {'day': 13, 'month': 12, 'year': 2023, 'event': 'is_finals_week'},
+        {'day': 14, 'month': 12, 'year': 2023, 'event': 'is_finals_week'},
+        {'day': 15, 'month': 12, 'year': 2023, 'event': 'is_finals_week'},
+        {'day': 15, 'month': 12, 'year': 2023, 'event': 'is_student_event'},
+        {'day': 25, 'month': 12, 'year': 2023, 'event': 'is_holiday'},
+        {'day': 26, 'month': 12, 'year': 2023, 'event': 'is_holiday'},
+        {'day': 1, 'month': 1, 'year': 2024, 'event': 'is_holiday'},
+        {'day': 2, 'month': 1, 'year': 2024, 'event': 'is_holiday'},
+        # Spring 2024
+        {'day': 15, 'month': 1, 'year': 2024, 'event': 'is_holiday'},
+        {'day': 19, 'month': 2, 'year': 2024, 'event': 'is_holiday'},
+        {'day': 23, 'month': 3, 'year': 2024, 'event': 'school_break'},
+        {'day': 24, 'month': 3, 'year': 2024, 'event': 'school_break'},
+        {'day': 25, 'month': 3, 'year': 2024, 'event': 'school_break'},
+        {'day': 26, 'month': 3, 'year': 2024, 'event': 'school_break'},
+        {'day': 27, 'month': 3, 'year': 2024, 'event': 'school_break'},
+        {'day': 28, 'month': 3, 'year': 2024, 'event': 'school_break'},
+        {'day': 29, 'month': 3, 'year': 2024, 'event': 'school_break'},
+        {'day': 30, 'month': 3, 'year': 2024, 'event': 'school_break'},
+        {'day': 31, 'month': 3, 'year': 2024, 'event': 'school_break'},
+        # {Cal Day TBD}
+        {'day': 29, 'month': 4, 'year': 2024, 'event': 'is_rrr_week'},
+        {'day': 30, 'month': 4, 'year': 2024, 'event': 'is_rrr_week'},
+        {'day': 1, 'month': 5, 'year': 2024, 'event': 'is_rrr_week'},
+        {'day': 2, 'month': 5, 'year': 2024, 'event': 'is_rrr_week'},
+        {'day': 3, 'month': 5, 'year': 2024, 'event': 'is_rrr_week'},
+        {'day': 6, 'month': 5, 'year': 2024, 'event': 'is_finals_week'},
+        {'day': 7, 'month': 5, 'year': 2024, 'event': 'is_finals_week'},
+        {'day': 8, 'month': 5, 'year': 2024, 'event': 'is_finals_week'},
+        {'day': 9, 'month': 5, 'year': 2024, 'event': 'is_finals_week'},
+        {'day': 10, 'month': 5, 'year': 2024, 'event': 'is_finals_week'},
+        {'day': 11, 'month': 5, 'year': 2024, 'event': 'is_student_event'}]
+
+        TimeStamp = pd.to_datetime(timestamp)
+        dayInput = TimeStamp.day
+        monthInput = TimeStamp.month
+        yearInput = TimeStamp.year
+
+        for date in special_days_dictionary:
+            day = date.get('day')
+            month = date.get('month')
+            year = date.get('year')
+            event = date.get('event')
+            
+            if dayInput == day and monthInput == month and yearInput == year:
+                return event
+        return None
 def fill_weather_data_in_rows():
     # Retrieve all timestamps from the 'rsf_training' table
     try:
@@ -232,130 +358,21 @@ def fill_weather_data_in_rows():
                 # Return the list of dictionaries containing day, month, and year
             return extracted_dates
     
-    def special_day(day, month, year):
-        # Fall 2022
-        {day: 3, month: 9, year: 2022, 'is_student_event': True} 
-        {day: 5, month: 9, year: 2022, 'is_holiday': True} 
-        {day: 10, month: 9, year: 2022, 'is_student_event': True} 
-        {day: 24, month: 9, year: 2022, 'is_student_event': True} 
-        {day: 22, month: 10, year: 2022, 'is_student_event': True} 
-        {day: 29, month: 10, year: 2022, 'is_student_event': True} 
-        {day: 11, month: 11, year: 2022, 'is_holiday': True} 
-        {day: 19, month: 11, year: 2022, 'is_student_event': True} 
-        {day: 23, month: 11, year: 2022, 'school_break': True} 
-        {day: 24, month: 11, year: 2022, 'school_break': True} 
-        {day: 25, month: 11, year: 2022, 'school_break': True, 'is_student_event': True} 
-        {day: 26, month: 11, year: 2022, 'school_break': True} 
-        {day: 27, month: 11, year: 2022, 'school_break': True} 
-        {day: 5, month: 12, year: 2022, 'is_rrr_week': True}
-        {day: 6, month: 12, year: 2022, 'is_rrr_week': True}
-        {day: 7, month: 12, year: 2022, 'is_rrr_week': True}
-        {day: 8, month: 12, year: 2022, 'is_rrr_week': True}
-        {day: 9, month: 12, year: 2022, 'is_rrr_week': True}
-        {day: 12, month: 12, year: 2022, 'is_finals_week': True}
-        {day: 13, month: 12, year: 2022, 'is_finals_week': True}
-        {day: 14, month: 12, year: 2022, 'is_finals_week': True}
-        {day: 15, month: 12, year: 2022, 'is_finals_week': True}
-        {day: 16, month: 12, year: 2022, 'is_finals_week': True}
-        {day: 17, month: 12, year: 2022, 'is_student_event': True}
-        {day: 23, month: 12, year: 2022, 'is_holiday': True} 
-        {day: 26, month: 12, year: 2022, 'is_holiday': True}
-        {day: 30, month: 12, year: 2022, 'is_holiday': True}
-        {day: 2, month: 1, year: 2023, 'is_holiday': True}
-        # Spring 2023
-        {day: 16, month: 1, year: 2023, 'is_holiday': True}
-        {day: 25, month: 2, year: 2023, 'is_holiday': True}
-        {day: 26, month: 3, year: 2023, 'school_break': True}
-        {day: 2, month: 3, year: 2023, 'school_break': True}
-        {day: 27, month: 3, year: 2023, 'school_break': True}
-        {day: 28, month: 3, year: 2023, 'school_break': True}
-        {day: 29, month: 3, year: 2023, 'school_break': True}
-        {day: 30, month: 3, year: 2023, 'school_break': True}
-        {day: 31, month: 3, year: 2023, 'school_break': True}
-        {day: 1, month: 4, year: 2023, 'school_break': True}
-        {day: 2, month: 4, year: 2023, 'school_break': True}
-        {day: 22, month: 4, year: 2023, 'is_student_event': True}
-        {day: 1, month: 5, year: 2023, 'is_rrr_week': True}
-        {day: 2, month: 5, year: 2023, 'is_rrr_week': True}
-        {day: 3, month: 5, year: 2023, 'is_rrr_week': True}
-        {day: 4, month: 5, year: 2023, 'is_rrr_week': True}
-        {day: 5, month: 5, year: 2023, 'is_rrr_week': True}
-        {day: 8, month: 5, year: 2023, 'is_finals_week': True}
-        {day: 9, month: 5, year: 2023, 'is_finals_week': True}
-        {day: 10, month: 5, year: 2023, 'is_finals_week': True}
-        {day: 11, month: 5, year: 2023, 'is_finals_week': True}
-        {day: 12, month: 5, year: 2023, 'is_finals_week': True}
-        {day: 13, month: 5, year: 2023, 'is_student_event': True}
-        {day: 29, month: 5, year: 2023, 'is_holiday': True}
-        # Summer 2023
-        {day: 19, month: 6, year: 2023, 'is_holiday': True}
-        {day: 4, month: 7, year: 2023, 'is_holiday': True}
-        # Fall 2023
-        {day: 4, month: 9, year: 2023, 'is_holiday': True}
-        {day: 9, month: 9, year: 2023, 'is_student_event': True}
-        {day: 16, month: 9, year: 2023, 'is_student_event': True}
-        {day: 30, month: 9, year: 2023, 'is_student_event': True}
-        {day: 7, month: 10, year: 2023, 'is_student_event': True}
-        {day: 28, month: 10, year: 2023, 'is_student_event': True}
-        {day: 10, month: 11, year: 2023, 'is_holiday': True}
-        {day: 11, month: 11, year: 2023, 'is_student_event': True}
-        {day: 22, month: 11, year: 2023, 'school_break': True}
-        {day: 23, month: 11, year: 2023, 'school_break': True}
-        {day: 24, month: 11, year: 2023, 'school_break': True}
-        {day: 25, month: 11, year: 2023, 'school_break': True}
-        {day: 26, month: 11, year: 2023, 'school_break': True}
-        {day: 4, month: 12, year: 2023, 'is_rrr_week': True}
-        {day: 5, month: 12, year: 2023, 'is_rrr_week': True}
-        {day: 6, month: 12, year: 2023, 'is_rrr_week': True}
-        {day: 7, month: 12, year: 2023, 'is_rrr_week': True}
-        {day: 8, month: 12, year: 2023, 'is_rrr_week': True}
-        {day: 11, month: 12, year: 2023, 'is_finals_week': True}
-        {day: 12, month: 12, year: 2023, 'is_finals_week': True}
-        {day: 13, month: 12, year: 2023, 'is_finals_week': True}
-        {day: 14, month: 12, year: 2023, 'is_finals_week': True}
-        {day: 15, month: 12, year: 2023, 'is_finals_week': True}
-        {day: 15, month: 12, year: 2023, 'is_student_event': True}
-        {day: 25, month: 12, year: 2023, 'is_holiday': True}
-        {day: 26, month: 12, year: 2023, 'is_holiday': True}
-        {day: 1, month: 1, year: 2024, 'is_holiday': True}
-        {day: 2, month: 1, year: 2024, 'is_holiday': True}
-        # Spring 2024
-        {day: 15, month: 1, year: 2024, 'is_holiday': True}
-        {day: 19, month: 2, year: 2024, 'is_holiday': True}
-        {day: 23, month: 3, year: 2024, 'school_break': True}
-        {day: 24, month: 3, year: 2024, 'school_break': True}
-        {day: 25, month: 3, year: 2024, 'school_break': True}
-        {day: 26, month: 3, year: 2024, 'school_break': True}
-        {day: 27, month: 3, year: 2024, 'school_break': True}
-        {day: 28, month: 3, year: 2024, 'school_break': True}
-        {day: 29, month: 3, year: 2024, 'school_break': True}
-        {day: 30, month: 3, year: 2024, 'school_break': True}
-        {day: 31, month: 3, year: 2024, 'school_break': True}
-        # {Cal Day TBD}
-        {day: 29, month: 4, year: 2024, 'is_rrr_week': True}
-        {day: 30, month: 4, year: 2024, 'is_rrr_week': True}
-        {day: 1, month: 5, year: 2024, 'is_rrr_week': True}
-        {day: 2, month: 5, year: 2024, 'is_rrr_week': True}
-        {day: 3, month: 5, year: 2024, 'is_rrr_week': True}
-        {day: 6, month: 5, year: 2024, 'is_finals_week': True}
-        {day: 7, month: 5, year: 2024, 'is_finals_week': True}
-        {day: 8, month: 5, year: 2024, 'is_finals_week': True}
-        {day: 9, month: 5, year: 2024, 'is_finals_week': True}
-        {day: 10, month: 5, year: 2024, 'is_finals_week': True}
-        {day: 11, month: 5, year: 2024, 'is_student_event': True}
-        return None #continue this 
     
-        # create dictionary for the special dates 
-        
-    
-    #Make a function that grabs a date, (day, month, and year) and returns if the date is a holiday, school_break, finals_week
-    #week before finals (rrr week), or if is a student event'''
 
-    # what if it is two of the following categories above? write for both 
+
+            
+
+        
+        
+ 
+
     
 if __name__ == "__main__":
     cockroach = CockroachDB()
     #cockroach.bulk_insert_crowdometer_data(['2022-10-01 07:20:00', '2022-10-01 07:25:00', '2022-10-01 07:30:00', '2022-10-01 07:35:00'], [12, 34, 49, 69], [1, 7, 2, 4])
     #cockroach.delete_rows()
     #print(len(cockroach.get_all_rows()))
-    print(cockroach.get_all_rows())
+    #print(cockroach.get_all_rows())
+    #print(cockroach.special_day(timestamp = '2022-11-25 14:30:00'))
+
