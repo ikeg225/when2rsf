@@ -25,6 +25,7 @@ raw.drop('by5', axis=1, inplace=True)
 
 raw = raw.reindex(columns=['Timestamp','weekday','count'])
 #print(raw.mean)
+print(raw.head)
 
-db=CockroachDB()
-db.bulk_insert_crowdometer_data(raw['Timestamp'],raw['count'],raw['weekday'])
+#db=CockroachDB()
+#db.bulk_insert_crowdometer_data(raw['Timestamp'],raw['count'],raw['weekday'])
