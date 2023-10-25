@@ -104,18 +104,18 @@ def get_current():
 
 def get_history(date):
 
-    str_date = str(date).split()
+    #str_date = str(date).split()
 
-    day = str_date[0] # example: 2022-10-01
-    time = str_date[1] # example: 07:20:00
+    #day = str_date[0] # example: 2022-10-01
+    #time = str_date[1] # example: 07:20:00
 
     load_dotenv()
 
-    #WEATHER_API_KEY = os.getenv('WEATHER_API_KEY')
+    #WEATHER_API_KEY = os.getenv('WEATHER_API_KEY') 
     WEATHER_API_KEY = "deb0a1d4b83849728e4215914230610"
     parameters = {
         'q': 'berkeley',
-        'dt': day,
+        'dt': date,
     }
 
     response = requests.get(f'http://api.weatherapi.com/v1/history.json?key={WEATHER_API_KEY}', params = parameters)
@@ -123,13 +123,13 @@ def get_history(date):
 
         data = response.json()
         hourly_data = data["forecast"]["forecastday"][0]["hour"]
-        date_object = datetime.strptime(day, "%Y-%m-%d")
+        date_object = datetime.strptime(date, "%Y-%m-%d")
         day_of_week = date_object.isoweekday()
         hourly_dict = {}
         for hour in hourly_data:
             time = hour['time']
-            temperature = hour['temp_c']
-            temp_feel = hour['feelslike_c']
+            temperature = hour['temp_f']
+            temp_feel = hour['feelslike_f']
             weather_code = hour['condition']['code']
             wind_mph = hour['wind_mph']
             wind_degree = hour['wind_degree']
@@ -167,7 +167,7 @@ def get_history(date):
     return hourly_dict
 
 
-#print(get_history("2022-10-10 07:20:00"))
+#print(get_history("2022-10-25"))
 
 
 

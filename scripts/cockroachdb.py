@@ -3,6 +3,7 @@ import psycopg
 from dotenv import load_dotenv
 import datetime 
 import pandas as pd
+from weather import get_history
 
 load_dotenv()
 
@@ -303,105 +304,75 @@ class CockroachDB:
         cockroach.backfill_dates(break_dates, 'school_break', True)
                 
         return None
-    '''Traceback (most recent call last):
-  File "C:\Users\kerry\when2rsf\when2rsf\scripts\cockroachdb.py", line 401, in <module>
-    cockroach.use_backfill_dates()
-  File "C:\Users\kerry\when2rsf\when2rsf\scripts\cockroachdb.py", line 289, in use_backfill_dates
-    cockroach.backfill_dates(current_date, 'is_student_event', True)
-  File "C:\Users\kerry\when2rsf\when2rsf\scripts\cockroachdb.py", line 145, in backfill_dates
-    for timestamp in timestamps:
-TypeError: 'datetime.datetime' object is not iterable
-PS C:\Users\kerry\when2rsf\when2rsf\scripts> python cockroachdb.py
-Traceback (most recent call last):
-  File "C:\Users\kerry\when2rsf\when2rsf\scripts\cockroachdb.py", line 411, in <module>
-    cockroach.use_backfill_dates()
-  File "C:\Users\kerry\when2rsf\when2rsf\scripts\cockroachdb.py", line 299, in use_backfill_dates
-    cockroach.backfill_dates(rrr_dates, 'is_rrr_week', True)
-  File "C:\Users\kerry\when2rsf\when2rsf\scripts\cockroachdb.py", line 147, in backfill_dates
-    self.connection.commit()
-  File "C:\Users\kerry\anaconda3\Lib\site-packages\psycopg\connection.py", line 885, in commit
-    self.wait(self._commit_gen())
-  File "C:\Users\kerry\anaconda3\Lib\site-packages\psycopg\connection.py", line 958, in wait
-    return waiting.wait(gen, self.pgconn.socket, timeout=timeout)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "psycopg_binary\\_psycopg/waiting.pyx", line 191, in psycopg_binary._psycopg.wait_c
-  File "C:\Users\kerry\anaconda3\Lib\site-packages\psycopg\connection.py", line 533, in _commit_gen
-    yield from self._exec_command(b"COMMIT")
-  File "C:\Users\kerry\anaconda3\Lib\site-packages\psycopg\connection.py", line 467, in _exec_command
-    raise e.error_from_result(result, encoding=pgconn_encoding(self.pgconn))
-psycopg.errors.SerializationFailure: restart transaction: TransactionRetryWithProtoRefreshError: TransactionRetryError: retry txn (RETRY_SERIALIZABLE - failed preemptive refresh due to a conflict: committed value on key /Tenant/10641/Table/106/1/910824900029710337/0): "sql txn" meta={id=023d2226 key=/Tenant/10641/Table/106/1/906017228119638017/0 pri=0.02201684 epo=0 ts=1698032409.605361371,2 min=1698031959.413951823,0 seq=2584} lock=true stat=PENDING rts=1698031959.413951823,0 wto=false gul=1698031959.913951823,0
-HINT:  See: https://www.cockroachlabs.com/docs/v23.1/transaction-retry-error-reference.html#retry_serializable
-PS C:\Users\kerry\when2rsf\when2rsf\scripts> 
-'''
 
-
-def fill_weather_data_in_rows():
-    # Retrieve all timestamps from the 'rsf_training' table
-    try:
-        select_timestamps_sql = "SELECT DISTINCT time FROM rsf_training"
-        
-        with self.connection.cursor() as cursor:
-            cursor.execute(select_timestamps_sql)
-            timestamps = cursor.fetchall()
-
-        # Iterate through the timestamps and fetch weather data for each
-        for timestamp in timestamps:
-            timestamp = timestamp[0]  # Extract the timestamp from the tuple
-
-            # Round the timestamp to the nearest hour
-            rounded_timestamp = timestamp.replace(minute=0, second=0, microsecond=0)
-
-            # Convert the rounded timestamp to a formatted date string
-            date_str = rounded_timestamp.strftime("%Y-%m-%d")
-
-            # Get weather data for the entire day using the 'get_history' function
-            weather_data = get_history(date_str)
-
-            # Extract the hour from the rounded timestamp
-            hour = rounded_timestamp.hour
-
-            # Update the corresponding rows in the 'rsf_training' table with weather data for the hour
-            update_sql = """
-                UPDATE rsf_training
-                SET 'day_of_week' = %(day_of_week)s,
-                    temperature = %(temperature)s,
-                    temp_feel = %(temp_feel)s,
-                    weather_code = %(weather_code)s,
-                    wind_mph = %(wind_mph)s,
-                    wind_degree = %(wind_degree)s,
-                    pressure_mb = %(pressure_mb)s,
-                    precipitation_mm = %(precipitation_mm)s,
-                    humidity = %(humidity)s,
-                    cloudiness = %(cloudiness)s,
-                    uv_index = %(uv_index)s,
-                    gust_mph = %(gust_mph)s
-                WHERE EXTRACT(HOUR FROM time) = %(hour)s
-            """
-
+    def fill_weather_data_in_rows(self):
+        # Retrieve all timestamps from the 'rsf_training' table
+        try:
+            select_timestamps_sql = "SELECT DISTINCT time FROM rsf_training WHERE time >= %s LIMIT 1"
             with self.connection.cursor() as cursor:
-                for time, weather_info in weather_data.items():
-                    data = {
-                        'day_of_week' : weather_info['day_of_week'],
-                        'temperature': weather_info['temperature'],
-                        'temp_feel': weather_info['temp_feel'],
-                        'weather_code': weather_info['weather_code'],
-                        'wind_mph': weather_info['wind_mph'],
-                        'wind_degree': weather_info['wind_degree'],
-                        'pressure_mb': weather_info['pressure_mb'],
-                        'precipitation_mm': weather_info['precipitation_mm'],
-                        'humidity': weather_info['humidity'],
-                        'cloudiness': weather_info['cloudiness'],
-                        'uv_index': weather_info['uv_index'],
-                        'gust_mph': weather_info['gust_mph'],
-                        'hour': hour,  # Use the hour extracted from the timestamp
-                    }
-                    cursor.execute(update_sql, data)
+                timestampval = (datetime.datetime(2022, 10, 26),) #Make sure the change this to 1 year past to real time
+                cursor.execute(select_timestamps_sql, timestampval) 
+                timestamps = cursor.fetchall()
 
-        # Commit the changes to the database
-        self.connection.commit()
-    except Exception as e:
-        # Handle exceptions here
-        print(f"An error occurred: {str(e)}")   
+            # Iterate through the timestamps and fetch weather data for each
+            for timestamp in timestamps:
+                timestamp = timestamp[0]  # Extract the timestamp from the tuple
+
+                # Round the timestamp to the nearest hour
+                rounded_timestamp = timestamp.replace(minute=0, second=0, microsecond=0)
+
+                # Convert the rounded timestamp to a formatted date string
+                date_str = rounded_timestamp.strftime("%Y-%m-%d")
+
+                # Get weather data for the entire day using the 'get_history' function
+                print(date_str)
+                weather_data = get_history(date_str)
+
+                # Extract the hour from the rounded timestamp
+                hour = rounded_timestamp.hour
+
+                # Update the corresponding rows in the 'rsf_training' table with weather data for the hour
+                update_sql = """
+                    UPDATE rsf_training
+                    SET day_of_week = %(day_of_week)s,
+                        temperature = %(temperature)s,
+                        temp_feel = %(temp_feel)s,
+                        weather_code = %(weather_code)s,
+                        wind_mph = %(wind_mph)s,
+                        wind_degree = %(wind_degree)s,
+                        pressure_mb = %(pressure_mb)s,
+                        precipitation_mm = %(precipitation_mm)s,
+                        humidity = %(humidity)s,
+                        cloudiness = %(cloudiness)s,
+                        uv_index = %(uv_index)s,
+                        gust_mph = %(gust_mph)s
+                    WHERE EXTRACT(HOUR FROM time) = %(hour)s
+                """
+
+                with self.connection.cursor() as cursor:
+                    for time, weather_info in weather_data.items():
+                        data = {
+                            'day_of_week' : weather_info['day_of_week'],
+                            'temperature': weather_info['temperature'],
+                            'temp_feel': weather_info['temp_feel'],
+                            'weather_code': weather_info['weather_code'],
+                            'wind_mph': weather_info['wind_mph'],
+                            'wind_degree': weather_info['wind_degree'],
+                            'pressure_mb': weather_info['pressure_mb'],
+                            'precipitation_mm': weather_info['precipitation_mm'],
+                            'humidity': weather_info['humidity'],
+                            'cloudiness': weather_info['cloudiness'],
+                            'uv_index': weather_info['uv_index'],
+                            'gust_mph': weather_info['gust_mph'],
+                            'hour': hour,  # Use the hour extracted from the timestamp
+                        }
+                        cursor.execute(update_sql, data)
+
+            # Commit the changes to the database
+            self.connection.commit()
+        except Exception as e:
+            # Handle exceptions here
+            print(f"An error occurred: {str(e)}")   
 
         def dates(self, timestamp):
             retrieve = """
@@ -439,5 +410,6 @@ if __name__ == "__main__":
     #print(len(cockroach.get_all_rows()))
     #print(cockroach.get_all_rows())   
     #print(cockroach.special_day(timestamp = '2024-5-25 14:30:00'))
-    cockroach.use_backfill_dates()
+    cockroach.fill_weather_data_in_rows()
+    #cockroach.use_backfill_dates()
 
