@@ -125,6 +125,11 @@ def get_history(date):
         hourly_data = data["forecast"]["forecastday"][0]["hour"]
         date_object = datetime.strptime(date, "%Y-%m-%d")
         day_of_week = date_object.isoweekday()
+        if day_of_week == 7:
+            day_of_week = 1
+        else:
+            day_of_week += 1
+
         hourly_dict = {}
         for hour in hourly_data:
             time = hour['time']
@@ -139,11 +144,6 @@ def get_history(date):
             cloudiness = hour['cloud']
             uv_index = hour['uv']
             gust_mph = hour['gust_mph']
-
-            if day_of_week == 7:
-                day_of_week = 1
-            else:
-                day_of_week += 1
 
             hourly_dict[time] = {
                 'day_of_week': day_of_week,  
@@ -162,6 +162,7 @@ def get_history(date):
     else:
         # Handle the error
         print(f"Error: API request failed with status code {response.status_code}")
+        return
 
         
     return hourly_dict

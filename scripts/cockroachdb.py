@@ -275,6 +275,7 @@ class CockroachDB:
 
         start_date = datetime.datetime(2022, 10, 1, 7, 20, 0)
         end_date = datetime.datetime(2023, 9, 21, 21, 20, 0)
+
         interval = datetime.timedelta(minutes=5)
 
         current_date = start_date
@@ -308,11 +309,14 @@ class CockroachDB:
     def fill_weather_data_in_rows(self):
         # Retrieve all timestamps from the 'rsf_training' table
         try:
-            select_timestamps_sql = "SELECT DISTINCT time FROM rsf_training WHERE time >= %s LIMIT 1"
+            select_timestamps_sql = "SELECT DISTINCT time FROM rsf_training WHERE time >= %s"
             with self.connection.cursor() as cursor:
-                timestampval = (datetime.datetime(2022, 10, 26),) #Make sure the change this to 1 year past to real time
+                timestampval = (datetime.datetime(2023, 10, 19),) #Make sure the change this to 1 year past to real time
                 cursor.execute(select_timestamps_sql, timestampval) 
                 timestamps = cursor.fetchall()
+            self.connection.commit()
+
+            done = set()
 
             # Iterate through the timestamps and fetch weather data for each
             for timestamp in timestamps:
@@ -324,12 +328,15 @@ class CockroachDB:
                 # Convert the rounded timestamp to a formatted date string
                 date_str = rounded_timestamp.strftime("%Y-%m-%d")
 
-                # Get weather data for the entire day using the 'get_history' function
+                if date_str in done:
+                    continue
+                else:
+                    done.add(date_str)
+                
                 print(date_str)
-                weather_data = get_history(date_str)
 
-                # Extract the hour from the rounded timestamp
-                hour = rounded_timestamp.hour
+                # Get weather data for the entire day using the 'get_history' function
+                weather_data = get_history(date_str)
 
                 # Update the corresponding rows in the 'rsf_training' table with weather data for the hour
                 update_sql = """
@@ -346,11 +353,12 @@ class CockroachDB:
                         cloudiness = %(cloudiness)s,
                         uv_index = %(uv_index)s,
                         gust_mph = %(gust_mph)s
-                    WHERE EXTRACT(HOUR FROM time) = %(hour)s
+                    WHERE date_trunc('hour', time) = %(timestamp)s;
                 """
 
                 with self.connection.cursor() as cursor:
                     for time, weather_info in weather_data.items():
+                        new_timestamp = datetime.datetime(rounded_timestamp.year, rounded_timestamp.month, rounded_timestamp.day, datetime.datetime.strptime(time, "%Y-%m-%d %H:%M").hour)
                         data = {
                             'day_of_week' : weather_info['day_of_week'],
                             'temperature': weather_info['temperature'],
@@ -364,12 +372,10 @@ class CockroachDB:
                             'cloudiness': weather_info['cloudiness'],
                             'uv_index': weather_info['uv_index'],
                             'gust_mph': weather_info['gust_mph'],
-                            'hour': hour,  # Use the hour extracted from the timestamp
+                            'timestamp': new_timestamp
                         }
                         cursor.execute(update_sql, data)
-
-            # Commit the changes to the database
-            self.connection.commit()
+                self.connection.commit()            
         except Exception as e:
             # Handle exceptions here
             print(f"An error occurred: {str(e)}")   
@@ -410,6 +416,6 @@ if __name__ == "__main__":
     #print(len(cockroach.get_all_rows()))
     #print(cockroach.get_all_rows())   
     #print(cockroach.special_day(timestamp = '2024-5-25 14:30:00'))
-    cockroach.fill_weather_data_in_rows()
+    # cockroach.use_backfill_dates()
     #cockroach.use_backfill_dates()
 
