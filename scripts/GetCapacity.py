@@ -88,9 +88,13 @@ def update_every_5_min():
         
         #Insert data into cockroach database 
 
+        special_days = cockroach.special_day(curr_time)
+
         cockroach.insert_only_crowdometer_data(
             curr_time, current_capacity, day_of_week, temperature, temp_feel, weather_code, wind_mph,
-            wind_degree, pressure_mb, precipitation_mm, humidity, cloudiness, uv_index, gust_mph
+            wind_degree, pressure_mb, precipitation_mm, humidity, cloudiness, uv_index, gust_mph,
+            'school_break' in special_days, 'is_holiday' in special_days, 'is_rrr_week' in special_days,
+            'is_finals_week' in special_days, 'is_student_event' in special_days
         )
 
 while True:

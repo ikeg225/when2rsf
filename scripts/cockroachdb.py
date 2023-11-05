@@ -53,13 +53,15 @@ class CockroachDB:
 
     def insert_only_crowdometer_data(self, 
         time, current_capacity, day_of_week, temperature, temp_feel, weather_code, wind_mph,
-        wind_degree, pressure_mb, precipitation_mm, humidity, cloudiness, uv_index, gust_mph
+        wind_degree, pressure_mb, precipitation_mm, humidity, cloudiness, uv_index, gust_mph,
+        school_break, is_holiday, is_rrr_week, is_finals_week, is_student_event
     ):
         insert_sql = """
         INSERT INTO rsf_training (time, current_capacity, day_of_week, temperature, temp_feel, weather_code, wind_mph, wind_degree, 
-        pressure_mb, precipitation_mm, humidity, cloudiness, uv_index, gust_mph)
+        pressure_mb, precipitation_mm, humidity, cloudiness, uv_index, gust_mph, school_break, is_holiday, is_rrr_week, is_finals_week, is_student_event)
         VALUES (%(time)s, %(current_capacity)s, %(day_of_week)s, %(temperature)s, %(temp_feel)s, %(weather_code)s, %(wind_mph)s, 
-         %(wind_degree)s, %(pressure_mb)s, %(precipitation_mm)s, %(humidity)s, %(cloudiness)s, %(uv_index)s, %(gust_mph)s)
+         %(wind_degree)s, %(pressure_mb)s, %(precipitation_mm)s, %(humidity)s, %(cloudiness)s, %(uv_index)s, %(gust_mph)s, 
+         %(school_break)s, %(is_holiday)s, %(is_rrr_week)s, %(is_finals_week)s, %(is_student_event)s)
         """
 
         data = {
@@ -76,8 +78,12 @@ class CockroachDB:
             'humidity': humidity,
             'cloudiness': cloudiness,
             'uv_index': uv_index,
-            'gust_mph': gust_mph
-
+            'gust_mph': gust_mph,
+            'school_break': school_break, 
+            'is_holiday': is_holiday, 
+            'is_rrr_week': is_rrr_week, 
+            'is_finals_week': is_finals_week, 
+            'is_student_event': is_student_event
         }
 
         with self.connection.cursor() as cursor:
