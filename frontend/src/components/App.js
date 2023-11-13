@@ -1,13 +1,21 @@
-import React, { Component } from 'react'
+import React from 'react'
+import Navbar from './Navbar'
+import Graph from './Graph'
+import SportsSchedule from './SportsSchedule'
+import Weather from './Weather'
+import CurrentData from './CurrentData'
 
-class App extends Component {
-    render() {
-        return (
-            <div>
-                <h1> oifdsguisfdng </h1>
+const App = () => {
+    return(
+        <div className = "App">
+            <Navbar />
+            <div className = 'content'>
+                <CurrentData />
+                <SportsSchedule />
+                <Graph />
+                <Weather />
             </div>
-        )
-    }
+        </div>
+    )
 }
-
 export default App
