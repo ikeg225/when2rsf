@@ -1,0 +1,29 @@
+.Navbar {
+    height: 5rem;
+    width: 100vw;
+    position: fixed;
+}
+
+.navbarNav {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.navItem {
+    margin: 0 15px;
+}
+
+.navLink {
+    display: flex;
+    align-items: center;
+    color: #D9D9D9;
+}
+
+.linkText {
+    color: #D9D9D9;
+    font-family: 'Open Sans';
+}
