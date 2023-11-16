@@ -6,13 +6,13 @@ function App() {
     <div className={styles.App}>
       <Navbar />
       <div className={`${styles.CurrentData} ${styles.mainContent}`}>
-          <h1>a</h1>
+          <h1>navigation bar</h1>
       </div>
       <div className={`${styles.SportsSchedule} ${styles.mainContent}`}>
-          <h1>b</h1>
+          <h1>sports schedule</h1>
       </div>
       <div className={`${styles.Graph} ${styles.mainContent}`}>
-          <h1>c</h1>
+          <h1>graph</h1>
       </div>
       <div className={`${styles.Weather} ${styles.mainContent}`}>
           <h1>d</h1>

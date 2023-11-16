@@ -10,3 +10,17 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+/* Styles for each specific section */
+div{
+  padding: 20px;
+  margin: 10px;
+  border-radius: 10px; /* Add this line for rounded corners */
+}
+
+.Weather{
+  padding: 20px;
+  margin: 10px;
+  border-radius: 10px; /* Adjust as needed for rounded corners */
+  width: 300px;
+}
