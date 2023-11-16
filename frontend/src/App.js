@@ -1,10 +1,10 @@
 import styles from './App.module.css';
-import NavBar from './components/NavBar';
+import Navbar from './components/Navbar';
 
 function App() {
   return (
     <div className={styles.App}>
-      <NavBar />
+      <Navbar />
       <div className={`${styles.CurrentData} ${styles.mainContent}`}>
           <h1>a</h1>
       </div>
