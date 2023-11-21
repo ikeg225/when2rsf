@@ -8,24 +8,22 @@ const NavBar = () => {
         <nav className = {styles.navbar}>
             <ul className = {styles.navbarNav}>
                 <li className = {styles.navItem}>
-                    <a href = '#' className = {styles.navLink}>
+                    <Link className={styles.navLink} to="/">
                         <GoGraph />
-                        <Link className={styles.linkText} to="/">Home</Link>
-                    </a>
+                        <p>Home</p>
+                    </Link>
                 </li>
-
                 <li className = {styles.navItem}>
-                    <a href = '#' className = {styles.navLink}>
+                    <Link className={styles.navLink} to="/how-it-works">
                         <GoLightBulb />
-                        <Link className={styles.linkText} to="/how-it-works">How it works</Link>
-                    </a>
+                        <p>How it works</p>
+                    </Link>
                 </li>
-
                 <li className = {styles.navItem}>
-                    <a href = '#' className = {styles.navLink}>
+                    <Link className={styles.navLink} to="/about-us">
                         <GoPeople />
-                        <Link className={styles.linkText} to="/about-us">About Us</Link>
-                    </a>
+                        <p>About Us</p>
+                    </Link>
                 </li>
             </ul>
         </nav> 
