@@ -23,4 +23,12 @@ div{
   margin: 10px;
   border-radius: 10px; /* Adjust as needed for rounded corners */
   width: 300px;
+  display: flex;
+}
+
+.WeatherWidget {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transform: scale(0.2);
 }

@@ -1,7 +1,24 @@
 import styles from './App.module.css';
 import Navbar from './components/Navbar';
+import Axios from 'axios'
+import React, { useEffect, useState } from 'react'
 
 function App() {
+
+  useEffect(() => {
+    const script = document.createElement('script');
+    script.src = 'https://www.weatherapi.com/weather/widget.ashx?loc=2549438&wid=3&tu=2&div=weatherapi-weather-widget-3';
+    script.async = true;
+
+    document.body.appendChild(script);
+
+    return () => {
+      document.body.removeChild(script);
+    };
+  }, []);
+
+
+
   return (
     <div className={styles.App}>
       <Navbar />
@@ -15,7 +32,11 @@ function App() {
           <h1>graph</h1>
       </div>
       <div className={`${styles.Weather} ${styles.mainContent}`}>
-          <h1>d</h1>
+        <div className={`${styles.WeatherWidget}`}>
+          <div id="weatherapi-weather-widget-3"></div>
+          <script type='text/javascript' src='https://www.weatherapi.com/weather/widget.ashx?loc=2549438&wid=3&tu=2&div=weatherapi-weather-widget-3' async></script>
+          <noscript><a href="https://www.weatherapi.com/weather/q/Berkeley-2549438" alt="Hour by hour Oakland weather">10 day hour by hour Oakland weather</a></noscript>
+        </div>
       </div>
     </div>
   );
