@@ -1,0 +1,16 @@
+.Home {
+    margin: 0;
+    padding: 0;
+}
+
+.mainContent {
+    margin: 30px 30px;
+    background-color: #2D374A;
+    display: flex;
+    justify-content: space-between;
+}
+
+.Weather {
+    display: flex;
+    justify-content: center;
+}

@@ -1,29 +1,30 @@
 import React from "react";
 import styles from './styles/NavBar.module.css';
 import { GoGraph, GoPeople, GoLightBulb } from 'react-icons/go'
+import { Link } from 'react-router-dom';
 
-const Navbar = () => {
+const NavBar = () => {
     return(
         <nav className = {styles.navbar}>
             <ul className = {styles.navbarNav}>
                 <li className = {styles.navItem}>
                     <a href = '#' className = {styles.navLink}>
                         <GoGraph />
-                        <span className = {styles.linkText}>Home</span>
+                        <Link className={styles.linkText} to="/">Home</Link>
                     </a>
                 </li>
 
                 <li className = {styles.navItem}>
                     <a href = '#' className = {styles.navLink}>
                         <GoLightBulb />
-                        <span className = {styles.linkText}>How it works</span>
+                        <Link className={styles.linkText} to="/how-it-works">How it works</Link>
                     </a>
                 </li>
 
                 <li className = {styles.navItem}>
                     <a href = '#' className = {styles.navLink}>
                         <GoPeople />
-                        <span className = {styles.linkText}>About Us</span>
+                        <Link className={styles.linkText} to="/about-us">About Us</Link>
                     </a>
                 </li>
             </ul>
@@ -31,4 +32,4 @@ const Navbar = () => {
     )
 }
 
-export default Navbar
+export default NavBar
