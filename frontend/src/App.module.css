@@ -9,3 +9,8 @@
   display: flex;
   justify-content: space-between;
 }
+
+.Weather {
+  display: flex;
+  justify-content: center;
+}
