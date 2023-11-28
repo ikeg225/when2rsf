@@ -13,4 +13,6 @@
 .Weather {
     display: flex;
     justify-content: center;
+    transform: scale(0.6);
+
 }
