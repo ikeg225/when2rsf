@@ -1,5 +1,6 @@
 import styles from './styles/Home.module.css';
 import React, { useEffect, useState } from 'react'
+import SportsSchedule from './SportsSchedule';
 
 function Home() {
   useEffect(() => {
@@ -21,6 +22,7 @@ function Home() {
       </div>
       <div className={`${styles.SportsSchedule} ${styles.mainContent}`}>
           <h1>sports schedule</h1>
+          <SportsSchedule />
       </div>
       <div className={`${styles.Graph} ${styles.mainContent}`}>
           <h1>graph</h1>
