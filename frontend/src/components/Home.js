@@ -1,6 +1,6 @@
 import styles from './styles/Home.module.css';
 import React, { useEffect, useState } from 'react'
-import SportsSchedule from './SportsSchedule';
+import UpcomingEvents from './UpcomingEvents';
 
 function Home() {
   useEffect(() => {
@@ -20,9 +20,9 @@ function Home() {
       <div className={`${styles.CurrentData} ${styles.mainContent}`}>
           <h1>navigation bar</h1>
       </div>
-      <div className={`${styles.SportsSchedule} ${styles.mainContent}`}>
-          <h1>sports schedule</h1>
-          <SportsSchedule />
+      <div className={`${styles.UpcomingEvents} ${styles.mainContent}`}>
+          <h1>upcoming events</h1>
+          <UpcomingEvents />
       </div>
       <div className={`${styles.Graph} ${styles.mainContent}`}>
           <h1>graph</h1>
