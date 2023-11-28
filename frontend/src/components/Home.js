@@ -59,23 +59,35 @@ console.log((labels).length)
 
 function Home() {
 
-  const [timeData, setTimeData] = useState([])
+  const [timeData, setTimeData] = useState([
+    // default time data
+  ])
+  const [todaySelected, setTodaySelected] = useState(true)
 
   const data = {
     labels,
     datasets: [
       {
-        data: [
-          47, 12, 85, 33, 76, 55, 97, 28, 64, 10, 
-          82, 5, 91, 59, 39, 73, 21, 44, 88, 34, 
-          67, 18, 50, 3, 79, 26, 62, 9, 81, 57, 
-          38, 72, 20
-        ],
+        data: timeData,
         borderColor: 'rgb(53, 162, 235)',
         backgroundColor: 'rgba(53, 162, 235, 0.5)',
       },
     ],
   };
+
+  const today = [
+    47, 12, 85, 33, 76, 55, 97, 28, 64, 10, 
+    82, 5, 91, 59, 39, 73, 21, 44, 88, 34, 
+    67, 18, 50, 3, 79, 26, 62, 9, 81, 57, 
+    38, 72, 20
+  ]
+
+  const tomorrow = [
+    12, 34, 56, 78, 21, 43, 65, 87, 9, 31, 
+    53, 75, 97, 19, 41, 63, 85, 7, 29, 51, 
+    73, 95, 17, 39, 61, 83, 5, 27, 49, 71, 
+    93, 15, 37
+  ]
 
 
   // Widget
@@ -91,42 +103,6 @@ function Home() {
     };
   }, []);
 
-  // Graph
-//   let now = new Date();
-//   const minTime = new Date(now)
-//   minTime.setMinutes(0, 0, 0)
-//   const maxTime = new Date(now)
-//   maxTime.setHours(maxTime.getHours() + 12)
-//   maxTime.setMinutes(0, 0, 0)
-//   if (maxTime < now) {
-//     maxTime.setHours(maxTime.getHours() + 1);
-// }
-
-//   const chartData = {
-//     datasets:[{
-//       label: "My Dataset",
-//       data: [
-//         { x: new Date('2023-11-27T00:00:00'), y: 4}
-//       ]
-//     }]
-//   }
-
-//   const options = {
-//     scales: {
-//       x: {
-//         type: "time",
-//         // time: {
-//         //   unit: "hour",
-//         // },
-//         // min: minTime,
-//         // max: maxTime
-//       },
-//       y: {
-//         beginAtZero: true
-//       }
-//     }
-//   }
-
   return (
     <div className={styles.Home}>
       <div className={`${styles.CurrentData} ${styles.mainContent}`}>
@@ -137,8 +113,19 @@ function Home() {
           <UpcomingEvents />
       </div>
       <div className={`${styles.Graph} ${styles.mainContent}`}>
-          <button>today</button>
-          <button>tomorrow</button>
+          <button 
+            className={`${styles.timeButton} ${todaySelected ? styles.buttonSelected : ''}`} 
+            onClick={() => {setTimeData(today); setTodaySelected(true)}}
+          >
+            Today
+          </button>
+          <button 
+            className={`${styles.timeButton} ${!todaySelected ? styles.buttonSelected : ''}`} 
+            onClick={() => {setTimeData(tomorrow); setTodaySelected(false)}}
+          >
+            Tomorrow
+          </button>
+
           <Line data={data} options={options}/>
       </div>
       <div className={`${styles.Weather} ${styles.mainContent}`}>

@@ -16,3 +16,15 @@
     transform: scale(0.6);
 
 }
+
+.timeButton {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 15px 8px;
+    transition-duration: 0.4s
+}
+
+.buttonSelected {
+    background-color: #35A2EB;
+}
