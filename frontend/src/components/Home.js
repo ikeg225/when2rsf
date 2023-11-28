@@ -40,14 +40,40 @@ export const options = {
     },
     title: {
       display: true,
-      text: '12 Hour RSF Capcity Prediction',
-      color: '#D9D9D9'
+      text: "12 Hour RSF Capcity Prediction",
+      color: "#D9D9D9",
     },
   },
   scales: {
     y: {
       min: 0,
       max: 100,
+      title: {
+        display: true,
+        align: "center",
+        text: "Percentage",
+        color: "#D9D9D9",
+      },
+      ticks: {
+        color: "#D9D9D9",
+      },
+      grid: {
+        color: "#4E5B70"
+      },
+    },
+    x: {
+      title: {
+        display: true,
+        align: "center",
+        text: "Time",
+        color: "#D9D9D9",
+      },
+      ticks: {
+        color: "#D9D9D9",
+      },
+      grid: {
+        color: "#4E5B70"
+      },
     }
   }
 };
@@ -70,7 +96,7 @@ function Home() {
       {
         data: timeData,
         borderColor: 'rgb(53, 162, 235)',
-        backgroundColor: 'rgba(53, 162, 235, 0.5)',
+        backgroundColor: "#D9D9D9",
       },
     ],
   };
@@ -113,6 +139,7 @@ function Home() {
           <UpcomingEvents />
       </div>
       <div className={`${styles.Graph} ${styles.mainContent}`}>
+        <div className={`${styles.buttonContainer}`}>
           <button 
             className={`${styles.timeButton} ${todaySelected ? styles.buttonSelected : ''}`} 
             onClick={() => {setTimeData(today); setTodaySelected(true)}}
@@ -125,7 +152,7 @@ function Home() {
           >
             Tomorrow
           </button>
-
+          </div>
           <Line data={data} options={options}/>
       </div>
       <div className={`${styles.Weather} ${styles.mainContent}`}>

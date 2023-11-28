@@ -14,7 +14,17 @@
     display: flex;
     justify-content: center;
     transform: scale(0.6);
+}
 
+.Graph {
+    display: flex;
+    flex-direction: column;
+    padding: 0
+}
+
+.buttonContainer {
+    display: flex;
+    justify-content: center;
 }
 
 .timeButton {
@@ -22,7 +32,11 @@
     justify-content: center;
     align-items: center;
     padding: 15px 8px;
-    transition-duration: 0.4s
+    transition-duration: 0.4s;
+    height: 25px;
+    width: 140px;
+    border-radius: 10px;
+    font-family: 'Open Sans';
 }
 
 .buttonSelected {
