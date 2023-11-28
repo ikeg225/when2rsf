@@ -51,7 +51,7 @@ export const options = {
       title: {
         display: true,
         align: "center",
-        text: "Percentage",
+        text: "Capacity Percentage",
         color: "#D9D9D9",
       },
       ticks: {
