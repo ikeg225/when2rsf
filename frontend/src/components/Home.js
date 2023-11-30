@@ -85,6 +85,14 @@ console.log((labels).length)
 
 function Home() {
 
+  // figure out how to use axios to make api calls 
+  // figure out how to use the weather api to get future weather data
+  // figure out what times you need tha future weather data
+  // then use axios on future weather api with specified times
+
+  // use school event data, get current date, return a list of booleans in the following order ['is_holiday', 'is_rrr_week', 'is_finals_week', 'is_student_event']
+
+
   const [timeData, setTimeData] = useState([
     // default time data
   ])
