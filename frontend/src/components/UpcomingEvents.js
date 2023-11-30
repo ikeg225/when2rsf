@@ -1,7 +1,7 @@
 import styles from './styles/UpcomingEvents.module.css'
 import React, { useEffect, useState } from 'react'
 
-const upcomingEvents = {
+export const upcomingEvents = {
     '9/3/2022': ['is_student_event'],
     '9/5/2022': ['is_holiday'], 
     '9/10/2022': ['is_student_event'], 
