@@ -2,7 +2,6 @@ import styles from './styles/Home.module.css';
 import React, { useEffect, useState } from 'react'
 import UpcomingEvents from './UpcomingEvents';
 import { Line } from 'react-chartjs-2';
-import Axios from 'axios'
 // import faker from 'faker';
 import {
   Chart as ChartJS,
@@ -16,7 +15,6 @@ import {
 } from 'chart.js';
 import 'chartjs-adapter-date-fns'
 import 'chartjs-adapter-moment'
-import { upcomingEvents } from './UpcomingEvents'
 
 ChartJS.register(
   CategoryScale,
@@ -94,46 +92,6 @@ function Home() {
 
   // use school event data, get current date, return a list of booleans in the following order ['is_holiday', 'is_rrr_week', 'is_finals_week', 'is_student_event']
 
-  const getData = (date) => {
-    Axios.get(`http://api.weatherapi.com/v1/history.json?key=${process.env.REACT_APP_WEATHER_API_KEY}`, {params: {q: "Berkeley", dt: date}})
-      .then(response => {
-        console.log(response.data[forcast])
-      })
-      .catch(error => {
-        console.log(error)
-      })
-  }
-
-  console.log(getData(("2023-11-29")))
-
-  // ['day_of_week', 'temperature', 'temp_feel', 'weather_code', 'wind_mph', 'wind_degree', 'pressure_mb', 'precipitation_mm', 'humidity', 'cloudiness', 'uv_index', 'gust_mph', 'school_break', 'is_holiday', 'is_rrr_week', 'is_finals_week', 'is_student_event', 'hour', 'date_category']
-
-  const weatherParameters = {
-    //day_of_week
-    temperature: "bjbh"
-
-  }
-    
-  
-  let todays_events = {
-    'is_holiday' : false,
-    'is_rrr_week' : false,
-    'is_finals_week' : false,
-    'is_student_event' : false
-  }
-  
-  const currentDate = new Date();
-  const formattedDate = currentDate.toLocaleDateString('en-US');
-  
-  if (upcomingEvents[formattedDate] == ['is_holiday']) {
-    todays_events['is_holiday'] = true;
-  } else if (upcomingEvents[today] == ['is_rrr_week']) {
-    todays_events['is_rrr_week'] = true;
-  } else if (upcomingEvents[today] == ['is_finals_week']) {
-    todays_events['is_finals_week'] = true;
-  } else if (upcomingEvents[today] == ['is_student_event']) {
-    todays_events['is_student_event'] = true;
-  }
 
   const [timeData, setTimeData] = useState([
     // default time data
