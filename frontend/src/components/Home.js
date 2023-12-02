@@ -78,10 +78,70 @@ export const options = {
   }
 };
 
+
 const labels = ['7:00AM', '7:30AM', '8:00AM', '8:30AM', '9:00AM', '9:30AM', '10:00AM', '10:30AM', '11:00AM',
 '11:30AM', '12:00PM', '12:30PM', '1:00PM', '1:30PM', '2:00PM', '2:30PM', '3:00PM', '3:30PM', '4:00PM', '4:30PM',
 '5:00PM', '5:30PM', '6:00PM', '6:30PM', '7:00PM', '7:30PM', '8:00PM', '8:30PM', '9:00PM', '9:30PM', '10:00PM', '10:30PM', '11:00PM'];
-console.log((labels).length)
+
+function extractTimes(input) {
+  const timePattern = /(\d{1,2})\s*(a\.m\.|p\.m\.)\s*-\s*(\d{1,2})\s*(a\.m\.|p\.m\.)/i;
+  const match = input.match(timePattern);
+
+  if (!match) {
+      throw new Error('Invalid time format');
+  }
+
+  let [_, startHour, startPeriod, endHour, endPeriod] = match;
+
+  // Convert to standard time format
+  startHour = startHour.length === 1 ? `0${startHour}` : startHour;
+  endHour = endHour.length === 1 ? `0${endHour}` : endHour;
+
+  const startTime = `${startHour}:00 ${startPeriod.toUpperCase().replace(/\./g, '')}`;
+  const endTime = `${endHour}:00 ${endPeriod.toUpperCase().replace(/\./g, '')}`;
+
+  return { startTime, endTime };
+}
+
+function createTimeLabels(startTime, endTime) {
+  function parseTime(timeStr) {
+      const [time, period] = timeStr.split(' ');
+      let [hours, minutes] = time.split(':').map(Number);
+
+      if (period === 'PM' && hours < 12) hours += 12;
+      if (period === 'AM' && hours === 12) hours = 0;
+
+      return new Date(2000, 0, 1, hours, minutes); // Date is arbitrary
+  }
+
+  function formatTime(date) {
+      let hours = date.getHours();
+      let minutes = date.getMinutes();
+      const period = hours >= 12 ? 'PM' : 'AM';
+
+      hours = hours % 12;
+      hours = hours ? hours : 12; // Convert hour '0' to '12'
+      minutes = minutes < 10 ? '0' + minutes : minutes;
+
+      return `${hours}:${minutes}${period}`;
+  }
+
+  const start = parseTime(startTime);
+  const end = parseTime(endTime);
+  const labels = [];
+  let current = new Date(start);
+
+  while (current <= end) {
+      labels.push(formatTime(current));
+      current = new Date(current.getTime() + 30 * 60000); // Add 30 minutes
+  }
+
+  return labels;
+}
+
+const test = extractTimes("Monday, Nov. 27	7 a.m. - 11 p.m.")
+
+console.log(createTimeLabels(test.startTime, test.endTime))
 
 function Home() {
 
@@ -91,6 +151,51 @@ function Home() {
   // then use axios on future weather api with specified times
 
   // use school event data, get current date, return a list of booleans in the following order ['is_holiday', 'is_rrr_week', 'is_finals_week', 'is_student_event']
+
+  const getForcast = () => {
+    Axios.get(`http://api.weatherapi.com/v1/forcast.json?key=${process.env.REACT_APP_WEATHER_API_KEY}`, {params: {q: "Berkeley", days: 2, aqi: "yes", alerts: "no"}})
+      .then(response => {
+        console.log(response.data.forcast)
+      })
+      .catch(error => {
+        console.log(error)
+      })
+  }
+
+  console.log(getForcast())
+
+  let todays_events = {
+    'is_holiday' : false,
+    'is_rrr_week' : false,
+    'is_finals_week' : false,
+    'is_student_event' : false
+  }
+  
+  const currentDate = new Date();
+  // const formattedDate = currentDate.toLocaleDateString('en-US');
+  
+  if (upcomingEvents[today]['categories'].contains('is_holiday')) {
+    todays_events['is_holiday'] = true;
+  } else if (upcomingEvents[today]['categories'].contains('is_rrr_week')) {
+    todays_events['is_rrr_week'] = true;
+  } else if (upcomingEvents[today]['categories'].contains('is_finals_week')) {
+    todays_events['is_finals_week'] = true;
+  } else if (upcomingEvents[today]['categories'].contains('is_student_event')) {
+    todays_events['is_student_event'] = true;
+  }
+
+
+  // ['day_of_week', 'temperature', 'temp_feel', 'weather_code', 'wind_mph', 'wind_degree', 'pressure_mb', 'precipitation_mm', 'humidity', 'cloudiness', 'uv_index', 'gust_mph', 'school_break', 'is_holiday', 'is_rrr_week', 'is_finals_week', 'is_student_event', 'hour']
+
+  const weatherParameters = {
+    day_of_week : currentDate.getDay + 1,
+    temperature: "bjbh",
+    school_break : todays_events['is_holiday'],
+    is_rrr_week : todays_events['is_rrr_week'],
+    is_finals_week : todays_events['is_finals_week'],
+    is_student_event : todays_events['is_student_event'],
+    hour : currentDate.getHours(),
+  }  
 
 
   const [timeData, setTimeData] = useState([
