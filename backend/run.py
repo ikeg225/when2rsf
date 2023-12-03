@@ -29,4 +29,4 @@ if __name__ == "__main__":
 # flask run
 
 # example request
-# curl -XPUT -H "Content-type: application/json" -d '{"day_of_week": 5, "temperature": 47, "temp_feel": 41, "weather_code": 1189, "wind_mph": 23.7, "wind_degree": 178, "pressure_mb": 1015, "precipitation_mm": 0, "humidity": 90, "cloudiness": 50, "uv_index": 1, "gust_mph": 13.3, "school_break": 0, "is_holiday": 0, "is_rrr_week": 0, "is_finals_week": 0, "is_student_event": 0, "hour": 18}' 'http://127.0.0.1:5000/predict'
+# curl -XPUT -H "Content-type: application/json" -d '{"day_of_week": 5, "temperature": 47, "temp_feel": 41, "wind_mph": 23.7, "wind_degree": 178, "pressure_mb": 1015, "precipitation_mm": 0, "humidity": 90, "cloudiness": 50, "uv_index": 1, "gust_mph": 13.3, "school_break": 0, "is_holiday": 0, "is_rrr_week": 0, "is_finals_week": 0, "is_student_event": 0, "hour": 18}' 'http://127.0.0.1:5000/predict'
