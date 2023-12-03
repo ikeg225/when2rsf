@@ -41,7 +41,7 @@ export const options = {
     },
     title: {
       display: true,
-      text: "12 Hour RSF Capcity Prediction",
+      text: "RSF Capcity Prediction",
       color: "#D9D9D9",
     },
   },
@@ -80,9 +80,8 @@ export const options = {
 };
 
 
-const labels = ['7:00AM', '7:30AM', '8:00AM', '8:30AM', '9:00AM', '9:30AM', '10:00AM', '10:30AM', '11:00AM',
-'11:30AM', '12:00PM', '12:30PM', '1:00PM', '1:30PM', '2:00PM', '2:30PM', '3:00PM', '3:30PM', '4:00PM', '4:30PM',
-'5:00PM', '5:30PM', '6:00PM', '6:30PM', '7:00PM', '7:30PM', '8:00PM', '8:30PM', '9:00PM', '9:30PM', '10:00PM', '10:30PM', '11:00PM'];
+const labels = ['7:00AM', '8:00AM', '9:00AM', '10:00AM', '11:00AM', '12:00PM', '1:00PM', '2:00PM', '3:00PM', '4:00PM',
+'5:00PM', '6:00PM', '7:00PM', '8:00PM', '9:00PM', '10:00PM', '11:00PM'];
 
 function extractTimes(input) {
   const timePattern = /(\d{1,2})\s*(a\.m\.|p\.m\.)\s*-\s*(\d{1,2})\s*(a\.m\.|p\.m\.)/i;
@@ -183,37 +182,50 @@ function Home() {
         today2.setDate(today2.getDate() + 1);
     }
     let dayOfWeek = today2.getDay(); 
-    if (dayOfWeek === 0) dayOfWeek = 7; 
+    if (dayOfWeek === 0) dayOfWeek = 7;
 
-    return day.hour.map(hour => ({
-      day_of_week: dayOfWeek,
-      temperature: hour.temp_f,
-      temp_feel: hour.feelslike_f,
-      wind_mph: hour.wind_mph,
-      wind_degree: hour.wind_degree,
-      pressure_mb: hour.pressure_mb,
-      precipitation_mm: hour.precip_mm,
-      humidity: hour.humidity,
-      cloudiness: hour.cloud,
-      uv_index: hour.uv,
-      gust_mph: hour.gust_mph,
-      school_break: today in upcomingEvents ? (upcomingEvents[today]['categories'].contains('school_break') ? 1 : 0) : 0,
-      is_holiday: today in upcomingEvents ? (upcomingEvents[today]['categories'].contains('is_holiday') ? 1 : 0) : 0,
-      is_rrr_week: today in upcomingEvents ? (upcomingEvents[today]['categories'].contains('is_rrr_week') ? 1 : 0) : 0,
-      is_finals_week: today in upcomingEvents ? (upcomingEvents[today]['categories'].contains('is_finals_week') ? 1 : 0) : 0,
-      is_student_event: today in upcomingEvents ? (upcomingEvents[today]['categories'].contains('is_student_event') ? 1 : 0) : 0,
-      hour: hour
-    }));
+    const arr = []
+    for (const hour of [7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23]) {
+      const hourJSON = day.hour[hour]
+      arr.push({
+        day_of_week: dayOfWeek,
+        temperature: hourJSON.temp_f,
+        temp_feel: hourJSON.feelslike_f,
+        wind_mph: hourJSON.wind_mph,
+        wind_degree: hourJSON.wind_degree,
+        pressure_mb: hourJSON.pressure_mb,
+        precipitation_mm: hourJSON.precip_mm,
+        humidity: hourJSON.humidity,
+        cloudiness: hourJSON.cloud,
+        uv_index: hourJSON.uv,
+        gust_mph: hourJSON.gust_mph,
+        school_break: today in upcomingEvents ? (upcomingEvents[today]['categories'].contains('school_break') ? 1 : 0) : 0,
+        is_holiday: today in upcomingEvents ? (upcomingEvents[today]['categories'].contains('is_holiday') ? 1 : 0) : 0,
+        is_rrr_week: today in upcomingEvents ? (upcomingEvents[today]['categories'].contains('is_rrr_week') ? 1 : 0) : 0,
+        is_finals_week: today in upcomingEvents ? (upcomingEvents[today]['categories'].contains('is_finals_week') ? 1 : 0) : 0,
+        is_student_event: today in upcomingEvents ? (upcomingEvents[today]['categories'].contains('is_student_event') ? 1 : 0) : 0,
+        hour: hour
+      })
+    }
+
+    return arr
   }
 
-  function makePrediction(parameter) {
-    Axios.put('https://api.when2rsf.com/predict', parameter)
+  async function makePrediction(parameter) {
+    const headers = { 
+      'Content-type':'application/json', 
+      'Accept':'application/json'
+    };
+    let pred = 0;
+
+    await Axios.put('https://api.when2rsf.com/predict', parameter, { headers })
       .then(response => {
-        console.log(response)
-        return;
+        pred = (response.data.prediction / 150) * 100;
       }, response => {
         console.log(response)
       })
+    
+    return pred
   }
 
   const [today, setTodaysPredictions] = useState([])
@@ -224,55 +236,25 @@ function Home() {
     const fetchData = async () => {
       const data = await getForecast();
 
-      for (const parameter in await createParameters(data.forecastday[0], false)) {
-        setTodaysPredictions(prevState => [...prevState, makePrediction(parameter)])
+      const todaysPredicted = []
+      for (const parameter of await createParameters(data.forecastday[0], false)) {
+        const pred = await makePrediction(parameter)
+        todaysPredicted.push(pred)
       }
+      setTodaysPredictions(todaysPredicted)
 
-      for (const parameter in await createParameters(data.forecastday[1], true)) {
-        console.log(parameter)
-        setTodaysPredictions(prevState => [...prevState, makePrediction(parameter)])
+      const tomorrowsPredicted = []
+      for (const parameter of await createParameters(data.forecastday[1], true)) {
+        const pred = await makePrediction(parameter)
+        tomorrowsPredicted.push(pred)
       }
-
-
-        // .then(data => {
-        //   // const parameters = {
-        //   //   "today": createParameters(data.forecastday[0], false), 
-        //   //   "tomorrow": createParameters(data.forecastday[1], true)
-        //   // }
-        //   // console.log(parameters)
-
-        //   for (const parameter in await createParameters(data.forecastday[0], false)) {
-        //     setTodaysPredictions(prevState => [...prevState, makePrediction(parameter)])
-        //   }
-
-        //   for (const parameter in createParameters(data.forecastday[1], true)) {
-        //     console.log(parameter)
-        //     setTodaysPredictions(prevState => [...prevState, makePrediction(parameter)])
-        //   }
-
-        //   // for (const key in parameters) {
-        //   //   const values = parameters[key]
-        //   //   for (let i = 0; i < values.length; i++) {
-        //   //     if (key == "today") {
-        //   //       console.log(values[i])
-        //   //       setTodaysPredictions(prevState => [...prevState, makePrediction(values[i])]);
-        //   //     } else if (key == "tomorrow") {
-        //   //       setTomorrowsPredictions(prevState => [...prevState, makePrediction(values[i])]);
-        //   //     }
-        //   //   }
-        //   // }
-        // })
-        // .catch(err => {
-        //   setError(err.message);
-        // });
+      setTomorrowsPredictions(tomorrowsPredicted)
     }
 
     fetchData();
   }, []);
 
-  const [timeData, setTimeData] = useState([
-    // default time data
-  ])
+  const [timeData, setTimeData] = useState(today)
   const [todaySelected, setTodaySelected] = useState(true)
 
   const data = {
