@@ -1,9 +1,11 @@
 from flask import Flask, request
 from flask_restful import Api, Resource
+from flask_cors import CORS
 import pandas as pd
 import pickle
 
 app = Flask(__name__)
+CORS(app)
 api = Api(app)
 
 model = pickle.load(open('model.pkl', 'rb'))
@@ -17,7 +19,6 @@ class Preds(Resource):
     entry = pd.DataFrame([json_])
     prediction = model.predict(entry)
     res = {'prediction': prediction[0]}
-    res.headers.add('Access-Control-Allow-Origin', '*')
     return res, 200
 
 api.add_resource(Preds, '/predict')
