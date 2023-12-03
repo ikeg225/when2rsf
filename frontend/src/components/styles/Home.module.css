@@ -43,9 +43,9 @@
     padding: 15px 8px;
     transition-duration: 0.4s;
     height: 25px;
-    width: 140px;
     border-radius: 10px;
     font-family: 'Open Sans';
+    cursor: pointer;
 }
 
 .buttonSelected {
@@ -66,3 +66,9 @@
     width: 1250px;
     height: 600px;
 }
+
+@media screen and (max-width: 1000px) {
+    .top {
+        flex-direction: column;
+    }
+}  

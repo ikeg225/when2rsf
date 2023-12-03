@@ -1,9 +1,8 @@
-import styles from './styles/Home.module.css';
+import styles from './styles/Home.module.css'
 import React, { useEffect, useState } from 'react'
-import UpcomingEvents, { upcomingEvents } from './UpcomingEvents';
-import { Line } from 'react-chartjs-2';
-import Axios from 'axios';
-// import faker from 'fa
+import UpcomingEvents, { upcomingEvents } from './UpcomingEvents'
+import { Line } from 'react-chartjs-2'
+import Axios from 'axios'
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -13,9 +12,12 @@ import {
   Title,
   Tooltip,
   Legend,
-} from 'chart.js';
+} from 'chart.js'
 import 'chartjs-adapter-date-fns'
 import 'chartjs-adapter-moment'
+import { setupCache } from 'axios-cache-interceptor'
+
+const axios = setupCache(Axios);
 
 ChartJS.register(
   CategoryScale,
@@ -88,7 +90,7 @@ function extractTimes(input) {
   const match = input.match(timePattern);
 
   if (!match) {
-      throw new Error('Invalid time format');
+    return "CLOSED"
   }
 
   let [_, startHour, startPeriod, endHour, endPeriod] = match;
@@ -146,17 +148,9 @@ console.log(createTimeLabels(test.startTime, test.endTime))
 
 
 function Home() {
-
-  // figure out how to use axios to make api calls 
-  // figure out how to use the weather api to get future weather data
-  // figure out what times you need tha future weather data
-  // then use axios on future weather api with specified times
-
-  // use school event data, get current date, return a list of booleans in the following order ['is_holiday', 'is_rrr_week', 'is_finals_week', 'is_student_event']
-
   const getForecast = async () => {
     try {
-      const response = await Axios.get(`http://api.weatherapi.com/v1/forecast.json?key=${process.env.REACT_APP_WEATHER_API_KEY}`, {
+      const response = await axios.get(`http://api.weatherapi.com/v1/forecast.json?key=${process.env.REACT_APP_WEATHER_API_KEY}`, {
         params: {
           q: "Berkeley",
           days: 2,
@@ -182,13 +176,12 @@ function Home() {
         today2.setDate(today2.getDate() + 1);
     }
     let dayOfWeek = today2.getDay(); 
-    if (dayOfWeek === 0) dayOfWeek = 7;
 
     const arr = []
     for (const hour of [7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23]) {
       const hourJSON = day.hour[hour]
       arr.push({
-        day_of_week: dayOfWeek,
+        day_of_week: dayOfWeek + 1,
         temperature: hourJSON.temp_f,
         temp_feel: hourJSON.feelslike_f,
         wind_mph: hourJSON.wind_mph,
@@ -218,7 +211,7 @@ function Home() {
     };
     let pred = 0;
 
-    await Axios.put('https://api.when2rsf.com/predict', parameter, { headers })
+    await axios.put('https://api.when2rsf.com/predict', parameter, { headers })
       .then(response => {
         pred = (response.data.prediction / 150) * 100;
       }, response => {
@@ -230,7 +223,6 @@ function Home() {
 
   const [today, setTodaysPredictions] = useState([])
   const [tomorrow, setTomorrowsPredictions] = useState([])
-  const [error, setError] = useState([])
 
   useEffect(() => {
     const fetchData = async () => {
@@ -258,29 +250,19 @@ function Home() {
   const [todaySelected, setTodaySelected] = useState(true)
 
   const data = {
-    labels,
-    datasets: [
-      {
-        data: timeData,
-        borderColor: 'rgb(53, 162, 235)',
-        backgroundColor: "#D9D9D9",
-      },
-    ],
-  };
-
-  // Widget
-  // useEffect(() => {
-  //   const script = document.createElement('script');
-  //   script.src = 'https://www.weatherapi.com/weather/widget.ashx?loc=2549438&wid=3&tu=2&div=weatherapi-weather-widget-3';
-  //   script.async = true;
-
-  //   document.body.appendChild(script);
-
-  //   return () => {
-  //     document.body.removeChild(script);
-  //   };
-  // }, []);
-
+      labels,
+      datasets: [
+        {
+          data: timeData,
+          borderColor: 'rgb(53, 162, 235)',
+          backgroundColor: "#D9D9D9",
+        },
+      ],
+    }
+  
+  useEffect(() => {
+    setTimeData(today)
+  }, [today])
   
   useEffect(() => {
     // Create a script element
@@ -298,6 +280,10 @@ function Home() {
     };
   }, []);
 
+  const todayDate = new Date()
+  const tomorrowDate = new Date(todayDate)
+  tomorrowDate.setDate(tomorrowDate.getDate() + 1)
+
   return (
     <div className={styles.Home}>
       <div className={styles.top}>
@@ -307,7 +293,7 @@ function Home() {
         <div className={`${styles.Weather} ${styles.weatherBackground}}`}>
           <div>
             <div id="ww_6d0678363ff5a" v='1.3' loc='auto' a='{"t":"horizontal","lang":"en","sl_lpl":1,"ids":[],"font":"Times","sl_ics":"one_a","sl_sot":"fahrenheit","cl_bkg":"image","cl_font":"#FFFFFF","cl_cloud":"#FFFFFF","cl_persp":"#81D4FA","cl_sun":"#FFC107","cl_moon":"#FFC107","cl_thund":"#FF5722"}'>
-                More forecasts: <a href="https://oneweather.org/toronto/30_days/" id="ww_6d0678363ff5a_u" target="_blank">Weather 30 days Toronto</a>
+                More forecasts: <a href="https://oneweather.org/toronto/30_days/" id="ww_6d0678363ff5a_u" target="_blank" rel="noreferrer">Weather 30 days Toronto</a>
             </div>
           </div>
         </div>
@@ -318,24 +304,17 @@ function Home() {
             className={`${styles.timeButton} ${todaySelected ? styles.buttonSelected : ''}`} 
             onClick={() => {setTimeData(today); setTodaySelected(true)}}
           >
-            Today
+            Today ({todayDate.toLocaleDateString('en-US')})
           </button>
           <button 
             className={`${styles.timeButton} ${!todaySelected ? styles.buttonSelected : ''}`} 
             onClick={() => {setTimeData(tomorrow); setTodaySelected(false)}}
           >
-            Tomorrow
+            Tomorrow ({tomorrowDate.toLocaleDateString('en-US')})
           </button>
           </div>
           <Line data={data} options={options}/>
       </div>
-      {/* <div className={`${styles.Weather} ${styles.mainContent} ${styles.weatherBackground}`}>
-        <div>
-          <div id="weatherapi-weather-widget-3"></div>
-          <script type='text/javascript' src='https://www.weatherapi.com/weather/widget.ashx?loc=2549438&wid=3&tu=2&div=weatherapi-weather-widget-3' async></script>
-          <noscript><a href="https://www.weatherapi.com/weather/q/Berkeley-2549438" alt="Hour by hour Oakland weather">10 day hour by hour Oakland weather</a></noscript>
-        </div>
-      </div> */}
     </div>
   );
 }

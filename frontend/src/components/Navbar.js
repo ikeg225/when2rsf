@@ -1,6 +1,6 @@
 import React from "react";
 import styles from './styles/NavBar.module.css';
-import { GoGraph, GoPeople, GoLightBulb } from 'react-icons/go'
+import { GoGraph, GoLightBulb } from 'react-icons/go'
 import { Link } from 'react-router-dom';
 
 const NavBar = () => {
@@ -17,12 +17,6 @@ const NavBar = () => {
                     <Link className={styles.navLink} to="/how-it-works">
                         <GoLightBulb />
                         <p>How it works</p>
-                    </Link>
-                </li>
-                <li className = {styles.navItem}>
-                    <Link className={styles.navLink} to="/about-us">
-                        <GoPeople />
-                        <p>About Us</p>
                     </Link>
                 </li>
             </ul>
