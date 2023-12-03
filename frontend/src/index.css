@@ -26,13 +26,6 @@ div{
   display: flex;
 }
 
-.WeatherWidget {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  transform: scale(0.2);
-}
-
 .weatherapi-weather-cover {
   
 }

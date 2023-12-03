@@ -5,7 +5,6 @@
 
 .mainContent {
     margin: 30px 30px;
-    background-color: #2D374A;
     display: flex;
     justify-content: space-between;
 }
@@ -13,7 +12,10 @@
 .Weather {
     display: flex;
     justify-content: center;
-    transform: scale(0.6);
+    align-items: center;
+    background-color: #2D374A;
+    width: 450px;
+    height: 250px;
 }
 
 .Graph {
@@ -41,4 +43,19 @@
 
 .buttonSelected {
     background-color: #35A2EB;
+}
+
+.eventsBackground {
+    background-color: #2D374A;
+    width: 255px;
+}
+
+.graphBackground {
+    background-color: #2D374A;
+}
+
+.weatherBackground {
+    background-color: #098428;
+    width: 1250px;
+    height: 600px;
 }
