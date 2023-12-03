@@ -17,6 +17,7 @@ class Preds(Resource):
     entry = pd.DataFrame([json_])
     prediction = model.predict(entry)
     res = {'prediction': prediction[0]}
+    res.headers.add('Access-Control-Allow-Origin', '*')
     return res, 200
 
 api.add_resource(Preds, '/predict')
