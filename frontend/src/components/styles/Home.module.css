@@ -1,6 +1,13 @@
 .Home {
     margin: 0;
-    padding: 0;
+    padding: 0;    
+}
+
+.top {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
 }
 
 .mainContent {
@@ -47,7 +54,7 @@
 
 .eventsBackground {
     background-color: #2D374A;
-    width: 255px;
+    width: 100%;
 }
 
 .graphBackground {

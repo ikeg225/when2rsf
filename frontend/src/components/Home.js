@@ -48,7 +48,7 @@ export const options = {
   scales: {
     y: {
       min: 0,
-      max: 100,
+      max: 110,
       title: {
         display: true,
         align: "center",
@@ -300,13 +300,15 @@ function Home() {
 
   return (
     <div className={styles.Home}>
-      <div className={`${styles.UpcomingEvents} ${styles.mainContent} ${styles.eventsBackground}`}>
-          <UpcomingEvents />
-      </div>
-      <div className={`${styles.Weather} ${styles.weatherBackground}}`}>
-        <div>
-          <div id="ww_6d0678363ff5a" v='1.3' loc='auto' a='{"t":"horizontal","lang":"en","sl_lpl":1,"ids":[],"font":"Times","sl_ics":"one_a","sl_sot":"fahrenheit","cl_bkg":"image","cl_font":"#FFFFFF","cl_cloud":"#FFFFFF","cl_persp":"#81D4FA","cl_sun":"#FFC107","cl_moon":"#FFC107","cl_thund":"#FF5722"}'>
-              More forecasts: <a href="https://oneweather.org/toronto/30_days/" id="ww_6d0678363ff5a_u" target="_blank">Weather 30 days Toronto</a>
+      <div className={styles.top}>
+        <div className={`${styles.UpcomingEvents} ${styles.eventsBackground}`}>
+            <UpcomingEvents />
+        </div>
+        <div className={`${styles.Weather} ${styles.weatherBackground}}`}>
+          <div>
+            <div id="ww_6d0678363ff5a" v='1.3' loc='auto' a='{"t":"horizontal","lang":"en","sl_lpl":1,"ids":[],"font":"Times","sl_ics":"one_a","sl_sot":"fahrenheit","cl_bkg":"image","cl_font":"#FFFFFF","cl_cloud":"#FFFFFF","cl_persp":"#81D4FA","cl_sun":"#FFC107","cl_moon":"#FFC107","cl_thund":"#FF5722"}'>
+                More forecasts: <a href="https://oneweather.org/toronto/30_days/" id="ww_6d0678363ff5a_u" target="_blank">Weather 30 days Toronto</a>
+            </div>
           </div>
         </div>
       </div>
