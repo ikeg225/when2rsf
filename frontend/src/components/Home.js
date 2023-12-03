@@ -150,7 +150,7 @@ console.log(createTimeLabels(test.startTime, test.endTime))
 function Home() {
   const getForecast = async () => {
     try {
-      const response = await axios.get(`https://cors-anywhere.herokuapp.com/https://api.weatherapi.com/v1/forecast.json?key=${process.env.REACT_APP_WEATHER_API_KEY}`, {
+      const response = await axios.get(`https://echo.hoppscotch.io/https://api.weatherapi.com/v1/forecast.json?key=${process.env.REACT_APP_WEATHER_API_KEY}`, {
         params: {
           q: "Berkeley",
           days: 2,
