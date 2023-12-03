@@ -152,7 +152,6 @@ export default function UpcomingEvents() {
         .sort((a, b) => new Date(a) - new Date(b)) // sort dates in ascending order
         .slice(0, 3); // take the first 3 upcoming dates
 
-
     return (
         <div className={styles.upcomingSchedule}>
             <h2>Upcoming Events</h2>

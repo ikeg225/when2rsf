@@ -1,8 +1,9 @@
 import styles from './styles/Home.module.css';
 import React, { useEffect, useState } from 'react'
-import UpcomingEvents from './UpcomingEvents';
+import UpcomingEvents, { upcomingEvents } from './UpcomingEvents';
 import { Line } from 'react-chartjs-2';
-// import faker from 'faker';
+import Axios from 'axios';
+// import faker from 'fa
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -133,15 +134,17 @@ function createTimeLabels(startTime, endTime) {
 
   while (current <= end) {
       labels.push(formatTime(current));
-      current = new Date(current.getTime() + 30 * 60000); // Add 30 minutes
+      current = new Date(current.getTime() + 60 * 60000); // Add 60 minutes
   }
 
   return labels;
 }
 
+
 const test = extractTimes("Monday, Nov. 27	7 a.m. - 11 p.m.")
 
 console.log(createTimeLabels(test.startTime, test.endTime))
+
 
 function Home() {
 
@@ -152,51 +155,120 @@ function Home() {
 
   // use school event data, get current date, return a list of booleans in the following order ['is_holiday', 'is_rrr_week', 'is_finals_week', 'is_student_event']
 
-  const getForcast = () => {
-    Axios.get(`http://api.weatherapi.com/v1/forcast.json?key=${process.env.REACT_APP_WEATHER_API_KEY}`, {params: {q: "Berkeley", days: 2, aqi: "yes", alerts: "no"}})
+  const getForecast = async () => {
+    try {
+      const response = await Axios.get(`http://api.weatherapi.com/v1/forecast.json?key=${process.env.REACT_APP_WEATHER_API_KEY}`, {
+        params: {
+          q: "Berkeley",
+          days: 2,
+          aqi: "yes",
+          alerts: "no"
+        }
+      });
+      console.log('Forecast Data Retrieved');
+      return response.data.forecast;
+    } catch (error) {
+      console.error('Error fetching weather data:', error);
+      // Depending on how you want to handle errors, you might throw the error or return null/undefined.
+      throw error;
+    }
+  }
+
+  function createParameters(day, isTomorrow) {
+    const currentDate = new Date();
+    const today = currentDate.toLocaleDateString('en-US');
+
+    const today2 = new Date();
+    if (isTomorrow) {
+        today2.setDate(today2.getDate() + 1);
+    }
+    let dayOfWeek = today2.getDay(); 
+    if (dayOfWeek === 0) dayOfWeek = 7; 
+
+    return day.hour.map(hour => ({
+      day_of_week: dayOfWeek,
+      temperature: hour.temp_f,
+      temp_feel: hour.feelslike_f,
+      wind_mph: hour.wind_mph,
+      wind_degree: hour.wind_degree,
+      pressure_mb: hour.pressure_mb,
+      precipitation_mm: hour.precip_mm,
+      humidity: hour.humidity,
+      cloudiness: hour.cloud,
+      uv_index: hour.uv,
+      gust_mph: hour.gust_mph,
+      school_break: today in upcomingEvents ? (upcomingEvents[today]['categories'].contains('school_break') ? 1 : 0) : 0,
+      is_holiday: today in upcomingEvents ? (upcomingEvents[today]['categories'].contains('is_holiday') ? 1 : 0) : 0,
+      is_rrr_week: today in upcomingEvents ? (upcomingEvents[today]['categories'].contains('is_rrr_week') ? 1 : 0) : 0,
+      is_finals_week: today in upcomingEvents ? (upcomingEvents[today]['categories'].contains('is_finals_week') ? 1 : 0) : 0,
+      is_student_event: today in upcomingEvents ? (upcomingEvents[today]['categories'].contains('is_student_event') ? 1 : 0) : 0,
+      hour: hour
+    }));
+  }
+
+  function makePrediction(parameter) {
+    Axios.put('https://api.when2rsf.com/predict', parameter)
       .then(response => {
-        console.log(response.data.forcast)
+        console.log(response)
+        return;
+      }, response => {
+        console.log(response)
       })
-      .catch(error => {
-        console.log(error)
-      })
   }
 
-  console.log(getForcast())
+  const [today, setTodaysPredictions] = useState([])
+  const [tomorrow, setTomorrowsPredictions] = useState([])
+  const [error, setError] = useState([])
 
-  let todays_events = {
-    'is_holiday' : false,
-    'is_rrr_week' : false,
-    'is_finals_week' : false,
-    'is_student_event' : false
-  }
-  
-  const currentDate = new Date();
-  // const formattedDate = currentDate.toLocaleDateString('en-US');
-  
-  if (upcomingEvents[today]['categories'].contains('is_holiday')) {
-    todays_events['is_holiday'] = true;
-  } else if (upcomingEvents[today]['categories'].contains('is_rrr_week')) {
-    todays_events['is_rrr_week'] = true;
-  } else if (upcomingEvents[today]['categories'].contains('is_finals_week')) {
-    todays_events['is_finals_week'] = true;
-  } else if (upcomingEvents[today]['categories'].contains('is_student_event')) {
-    todays_events['is_student_event'] = true;
-  }
+  useEffect(() => {
+    const fetchData = async () => {
+      const data = await getForecast();
+
+      for (const parameter in await createParameters(data.forecastday[0], false)) {
+        setTodaysPredictions(prevState => [...prevState, makePrediction(parameter)])
+      }
+
+      for (const parameter in await createParameters(data.forecastday[1], true)) {
+        console.log(parameter)
+        setTodaysPredictions(prevState => [...prevState, makePrediction(parameter)])
+      }
 
 
-  // ['day_of_week', 'temperature', 'temp_feel', 'weather_code', 'wind_mph', 'wind_degree', 'pressure_mb', 'precipitation_mm', 'humidity', 'cloudiness', 'uv_index', 'gust_mph', 'school_break', 'is_holiday', 'is_rrr_week', 'is_finals_week', 'is_student_event', 'hour']
+        // .then(data => {
+        //   // const parameters = {
+        //   //   "today": createParameters(data.forecastday[0], false), 
+        //   //   "tomorrow": createParameters(data.forecastday[1], true)
+        //   // }
+        //   // console.log(parameters)
 
-  const weatherParameters = {
-    day_of_week : currentDate.getDay + 1,
-    temperature: "bjbh",
-    school_break : todays_events['is_holiday'],
-    is_rrr_week : todays_events['is_rrr_week'],
-    is_finals_week : todays_events['is_finals_week'],
-    is_student_event : todays_events['is_student_event'],
-    hour : currentDate.getHours(),
-  }  
+        //   for (const parameter in await createParameters(data.forecastday[0], false)) {
+        //     setTodaysPredictions(prevState => [...prevState, makePrediction(parameter)])
+        //   }
 
+        //   for (const parameter in createParameters(data.forecastday[1], true)) {
+        //     console.log(parameter)
+        //     setTodaysPredictions(prevState => [...prevState, makePrediction(parameter)])
+        //   }
+
+        //   // for (const key in parameters) {
+        //   //   const values = parameters[key]
+        //   //   for (let i = 0; i < values.length; i++) {
+        //   //     if (key == "today") {
+        //   //       console.log(values[i])
+        //   //       setTodaysPredictions(prevState => [...prevState, makePrediction(values[i])]);
+        //   //     } else if (key == "tomorrow") {
+        //   //       setTomorrowsPredictions(prevState => [...prevState, makePrediction(values[i])]);
+        //   //     }
+        //   //   }
+        //   // }
+        // })
+        // .catch(err => {
+        //   setError(err.message);
+        // });
+    }
+
+    fetchData();
+  }, []);
 
   const [timeData, setTimeData] = useState([
     // default time data
@@ -214,21 +286,6 @@ function Home() {
     ],
   };
 
-  const today = [
-    47, 12, 85, 33, 76, 55, 97, 28, 64, 10, 
-    82, 5, 91, 59, 39, 73, 21, 44, 88, 34, 
-    67, 18, 50, 3, 79, 26, 62, 9, 81, 57, 
-    38, 72, 20
-  ]
-
-  const tomorrow = [
-    12, 34, 56, 78, 21, 43, 65, 87, 9, 31, 
-    53, 75, 97, 19, 41, 63, 85, 7, 29, 51, 
-    73, 95, 17, 39, 61, 83, 5, 27, 49, 71, 
-    93, 15, 37
-  ]
-
-
   // Widget
   useEffect(() => {
     const script = document.createElement('script');
@@ -244,11 +301,7 @@ function Home() {
 
   return (
     <div className={styles.Home}>
-      <div className={`${styles.CurrentData} ${styles.mainContent}`}>
-          <h1>navigation bar</h1>
-      </div>
       <div className={`${styles.UpcomingEvents} ${styles.mainContent}`}>
-          <h1>upcoming events</h1>
           <UpcomingEvents />
       </div>
       <div className={`${styles.Graph} ${styles.mainContent}`}>
