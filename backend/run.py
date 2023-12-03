@@ -22,7 +22,8 @@ class Preds(Resource):
 api.add_resource(Preds, '/predict')
 
 if __name__ == "__main__":
-  app.run(debug = True)
+  from waitress import serve
+  serve(app, host="0.0.0.0", port=5001)
 
 # to run the flask app (make sure to install Flask)
 # export FLASK_APP=run
