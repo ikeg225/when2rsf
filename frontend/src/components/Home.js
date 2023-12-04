@@ -192,11 +192,11 @@ function Home() {
         cloudiness: hourJSON.cloud,
         uv_index: hourJSON.uv,
         gust_mph: hourJSON.gust_mph,
-        school_break: today in upcomingEvents ? (upcomingEvents[today]['categories'].contains('school_break') ? 1 : 0) : 0,
-        is_holiday: today in upcomingEvents ? (upcomingEvents[today]['categories'].contains('is_holiday') ? 1 : 0) : 0,
-        is_rrr_week: today in upcomingEvents ? (upcomingEvents[today]['categories'].contains('is_rrr_week') ? 1 : 0) : 0,
-        is_finals_week: today in upcomingEvents ? (upcomingEvents[today]['categories'].contains('is_finals_week') ? 1 : 0) : 0,
-        is_student_event: today in upcomingEvents ? (upcomingEvents[today]['categories'].contains('is_student_event') ? 1 : 0) : 0,
+        school_break: today in upcomingEvents ? (upcomingEvents[today]['categories'].includes('school_break') ? 1 : 0) : 0,
+        is_holiday: today in upcomingEvents ? (upcomingEvents[today]['categories'].includes('is_holiday') ? 1 : 0) : 0,
+        is_rrr_week: today in upcomingEvents ? (upcomingEvents[today]['categories'].includes('is_rrr_week') ? 1 : 0) : 0,
+        is_finals_week: today in upcomingEvents ? (upcomingEvents[today]['categories'].includes('is_finals_week') ? 1 : 0) : 0,
+        is_student_event: today in upcomingEvents ? (upcomingEvents[today]['categories'].includes('is_student_event') ? 1 : 0) : 0,
         hour: hour
       })
     }
